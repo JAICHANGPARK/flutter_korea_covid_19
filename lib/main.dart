@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermasktest/model/mask.dart';
 
@@ -52,6 +53,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Mask resultList;
+  List<Stores> stores;
 
   Future<Mask> getMask() async {
     var url =
@@ -60,7 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
-      Mask m = Mask.fromJson(json.decode(response.body));
+      Mask m = Mask.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+
       return m;
     } else {
       return null;
@@ -101,27 +104,44 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-          child: FutureBuilder(
-        future: getMask(),
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-            return ListView.builder(itemBuilder: (context, index) {
-              return Container();
-            });
-          }
-          else{
-            return CircularProgressIndicator();
-          }
-
-        },
+          child: Column(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: FutureBuilder<Mask>(
+              future: getMask(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  resultList = snapshot.data;
+                  stores = resultList.stores;
+                  return ListView.builder(
+                      itemCount: stores.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          height: 108,
+                          color: Colors.red,
+                          margin: EdgeInsets.only(bottom: 16),
+                          child: Column(
+                            children: <Widget>[
+                              Text(stores[index].addr),
+                            ],
+                          ),
+                        );
+                      });
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
+          ),
+        ],
       )),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: getMask,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
