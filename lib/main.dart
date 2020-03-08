@@ -122,34 +122,57 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-        children: <Widget>[
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
             Card(
-              child: Container(height: 120,
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        Text('위도'),
-                        TextField()
-                      ],
+              child: Container(
+                height: MediaQuery.of(context).size.height / 4,
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(flex: 2, child: Text('위도')),
+                          Expanded(
+                            flex: 8,
+                            child: TextField(
+                              decoration: InputDecoration(),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded( child: Row(
-                    children: <Widget>[
-                      Expanded(child: Text('경도')),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(),
-                        ),
-                      )
-                    ],
-                  ),)
-                ],
-              ),),
-
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(flex: 2, child: Text('경도')),
+                          Expanded(
+                            flex: 8,
+                            child: TextField(
+                              decoration: InputDecoration(),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(flex: 2, child: Text('검색 반경')),
+                          Expanded(
+                            flex: 8,
+                            child: TextField(
+                              decoration: InputDecoration(),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
             Container(
               height: MediaQuery.of(context).size.height,
@@ -163,34 +186,49 @@ class _MyHomePageState extends State<MyHomePage> {
                     return ListView.builder(
                         itemCount: stores.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            height: 108,
-                            color: Colors.red,
-                            margin: EdgeInsets.only(bottom: 16),
-                            child: Column(
-                              children: <Widget>[
-                                Text(stores[index].addr),
-                              ],
+                          return Card(
+                            child: Container(
+                              height: 108,
+                              margin: EdgeInsets.only(bottom: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(stores[index].addr),
+                                  Text(stores[index].name),
+                                  Text(stores[index].soldCnt.toString()),
+                                  Text(stores[index].soldOut.toString()),
+                                  Text("재고수량: ${stores[index].stockCnt.toString()}")
+                                ],
+                              ),
                             ),
                           );
                         });
                   } else {
-                    return CircularProgressIndicator();
+                    return Center(
+                        child: Column(
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Text("정보요청중...")
+                          ],
+                        ));
                   }
                 },
               ),
             ),
-        ],
-      ),
-          )),
+          ],
+        ),
+      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            stores.clear();
+            if(stores != null){
+              stores.clear();
+            }
+
           });
         },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        tooltip: 'Refresh',
+        child: Icon(Icons.refresh),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
