@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: '공적마스크 검색'),
     );
   }
 }
@@ -103,45 +103,92 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            ListTile(
+              title: Text("개발"),
+              subtitle: Text("박제창"),
+            ),
+            ListTile(
+              title: Text("주소"),
+              subtitle: Text("aristojeff@gmail.com"),
+            )
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-          child: Column(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
         children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: FutureBuilder<Mask>(
-              future: getMask(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  resultList = snapshot.data;
-                  stores = resultList.stores;
-                  return ListView.builder(
-                      itemCount: stores.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 108,
-                          color: Colors.red,
-                          margin: EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            children: <Widget>[
-                              Text(stores[index].addr),
-                            ],
-                          ),
-                        );
-                      });
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
+            Card(
+              child: Container(height: 120,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        Text('위도'),
+                        TextField()
+                      ],
+                    ),
+                  ),
+                  Expanded( child: Row(
+                    children: <Widget>[
+                      Expanded(child: Text('경도')),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(),
+                        ),
+                      )
+                    ],
+                  ),)
+                ],
+              ),),
+
             ),
-          ),
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: FutureBuilder<Mask>(
+                future: getMask(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    resultList = snapshot.data;
+                    stores = resultList.stores;
+                    return ListView.builder(
+                        itemCount: stores.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 108,
+                            color: Colors.red,
+                            margin: EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text(stores[index].addr),
+                              ],
+                            ),
+                          );
+                        });
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ),
+            ),
         ],
-      )),
+      ),
+          )),
       floatingActionButton: FloatingActionButton(
-        onPressed: getMask,
+        onPressed: () {
+          setState(() {
+            stores.clear();
+          });
+        },
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
