@@ -21,9 +21,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+
+      title: '공적마스크 검색이',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        primaryColor: Colors.teal,
+        accentColor: Colors.red
       ),
       home: MyHomePage(title: '공적마스크 검색'),
     );
@@ -67,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String lat = prefs.getString('recent_lat')?? "";
     String lng = prefs.getString('recent_lng')?? "";
-    String range = prefs.getString('recent_rannge')?? "";
+    String range = prefs.getString('recent_range')?? "";
     String dt = prefs.getString('recent_datetime')?? "";
     Recent tmp = Recent(lat, lng, range, dt);
     return tmp;
@@ -77,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('recent_lat', lat);
     await prefs.setString('recent_lng', lng);
-    await prefs.setString('recent_rannge', range);
+    await prefs.setString('recent_range', range);
     await prefs.setString('recent_datetime', DateTime.now().toString());
   }
 
@@ -144,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Card(
                   child: Container(
                     height: MediaQuery.of(context).size.height / 2.5,
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.only(top: 16, left: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -155,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(flex: 2, child: Text('위도')),
                               Expanded(
                                 flex: 8,
-                                child: TextField(
+                                child: TextField( keyboardType: TextInputType.number,
                                   controller: latTextController,
                                   decoration: InputDecoration(
                                       labelText: "위도", hintText: "37.xxx"),
@@ -171,6 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(
                                 flex: 8,
                                 child: TextField(
+                                  keyboardType: TextInputType.number,
                                   controller: lngTextController,
                                   decoration: InputDecoration(
                                       labelText: "경도", hintText: "127.xxx"),
@@ -185,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(flex: 2, child: Text('검색 반경')),
                               Expanded(
                                 flex: 8,
-                                child: TextField(
+                                child: TextField( keyboardType: TextInputType.number,
                                   controller: rangeTextController,
                                   decoration: InputDecoration(
                                       labelText: "반경(m)", hintText: "10m"),
