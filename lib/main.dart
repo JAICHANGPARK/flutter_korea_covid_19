@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttermasktest/model/mask.dart';
 import 'package:fluttermasktest/model/recent.dart';
 import 'package:fluttermasktest/model/search.dart';
+import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
@@ -165,31 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
           index: pageIndex,
           children: <Widget>[
             !appPublishFlag
-                ? SafeArea(
-                    child: Card(
-                      elevation: 7,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height - 160,
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                                "마스크 수요에 불철주야로 고생하시는 대한민국 약사님들께 감사의 인사를 드립니다."),
-                            Image.network(
-                                "https://assets-ouch.icons8.com/thumb/676/f10310c4-3d7d-4e98-8541-1ea864393a04.png"),
-                            Text("현재 서비스 준비중 및 테스트 기간 입니다."),
-                            Text(
-                              "대한약사회의 요청으로 정식 서비스까지 서비스 이용을 제한합니다",
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
+                ? NotificationItem()
                 : Column(
                     children: <Widget>[
                       Card(
