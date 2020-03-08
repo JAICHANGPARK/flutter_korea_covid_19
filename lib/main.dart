@@ -287,6 +287,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       )),
+     bottomNavigationBar: BottomNavigationBar(
+       items: [
+         BottomNavigationBarItem(
+           icon: Icon(Icons.search),
+           title: Text("약국목록")
+         ),
+         BottomNavigationBarItem(
+           icon: Icon(Icons.list),
+           title: Text("검색기록")
+         ),
+       ]
+     ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
