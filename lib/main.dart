@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Mask resultList;
   List<Stores> stores;
   String userDay = "";
+  String userBirth = "";
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
@@ -90,15 +91,24 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString('recent_datetime', DateTime.now().toString());
   }
 
-  Future<void> setUserBirth(String b) async {
+  Future<void> setUserBirth(String b, String d) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_birth', b);
+    await prefs.setString('user_day', d);
   }
 
   Future<String> getUserBirth() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String birth = prefs.getString('user_birth') ?? "";
+
     return birth;
+  }
+
+  Future<String> getUserDay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String day = prefs.getString('user_day') ?? "";
+
+    return day;
   }
 
   Future<bool> getPublishState() async {
@@ -108,10 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     await remoteConfig.fetch(expiration: const Duration(hours: 5));
     await remoteConfig.activateFetched();
-    print('welcome message: ' + remoteConfig.getString('welcome'));
 
     var tmp = remoteConfig.getString("publish");
-    print(tmp);
+
     return tmp == "0" ? false : true;
   }
 
@@ -120,23 +129,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     getPublishState().then((result) {
-      print("return result : $result");
       if (result) {
         setState(() {
           appPublishFlag = true;
         });
 
         getSearchLog().then((r) {
-          print(r);
           latTextController.text = r.lat;
           lngTextController.text = r.lng;
           rangeTextController.text = r.range;
-
-          getUserBirth().then((value) {
-            setState(() {
-              userDay = value;
-            });
-          });
         });
       } else {
         setState(() {
@@ -191,9 +192,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text("태어난 년도 입력 및 수정"),
-              subtitle: Text("마스크 5부제 요일 확인을 위한 정보입니다.",style: TextStyle(
-                  fontSize: 12
-              ),),
+              subtitle: Text(
+                "마스크 5부제 요일 확인을 위한 정보입니다.",
+                style: TextStyle(fontSize: 12),
+              ),
               onTap: () {
                 setState(() {
                   pageIndex = 2;
@@ -234,9 +236,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text("유의사항"),
-              subtitle: Text("5분 이상 전의 데이터로 실제 재고와 다를 수 있습니다",style: TextStyle(
-                fontSize: 12
-              ),),
+              subtitle: Text(
+                "5분 이상 전의 데이터로 실제 재고와 다를 수 있습니다",
+                style: TextStyle(fontSize: 12),
+              ),
             )
           ],
         ),
@@ -473,24 +476,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                   if (birthTextController.text.length > 0 &&
                                       birthTextController.text.length == 4) {
                                     FocusScope.of(context).unfocus();
-                                    print(birthTextController.text[3]);
+
                                     int num =
                                         int.parse(birthTextController.text[3]);
-                                    setUserBirth(birthTextController.text);
-                                    setState(() {
-                                      if (num == 1 || num == 6) {
-                                        userDay = "월";
-                                      } else if (num == 2 || num == 7) {
-                                        userDay = "화";
-                                      } else if (num == 3 || num == 8) {
-                                        userDay = "수";
-                                      } else if (num == 4 || num == 9) {
-                                        userDay = "목";
-                                      } else if (num == 5 || num == 0) {
-                                        userDay = "금";
-                                      }
-                                      print(userDay);
-                                    });
+
+                                    if (num == 1 || num == 6) {
+                                      userDay = "월";
+                                    } else if (num == 2 || num == 7) {
+                                      userDay = "화";
+                                    } else if (num == 3 || num == 8) {
+                                      userDay = "수";
+                                    } else if (num == 4 || num == 9) {
+                                      userDay = "목";
+                                    } else if (num == 5 || num == 0) {
+                                      userDay = "금";
+                                    }
+
+                                    setUserBirth(
+                                        birthTextController.text, userDay);
+
+                                    setState(() {});
                                   } else {
                                     showDialog(
                                         context: context,
@@ -553,6 +558,17 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: pageIndex,
           onTap: (newValue) {
+            if (newValue == 2) {
+              getUserBirth().then((value) {
+                birthTextController.text = value;
+                getUserDay().then((v) {
+                  setState(() {
+                    userDay = v;
+                  });
+                });
+              });
+            }
+
             setState(() {
               pageIndex = newValue;
             });
