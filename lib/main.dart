@@ -58,9 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
 
-  Future<Mask> getMask() async {
+  Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
-        'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=37.551025&lng=127.143759&m=1000';
+        'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
     var response = await http.get(url);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
@@ -109,15 +109,25 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
-            ListTile(
-              title: Text("개발"),
-              subtitle: Text("박제창"),
+            ExpansionTile(
+              title: Text("개발자 정보"),
+              children: <Widget>[
+                ListTile(
+                  title: Text("개발"),
+                  subtitle: Text("박제창"),
+                ),
+                ListTile(
+                  title: Text("이메일"),
+                  subtitle: Text("aristojeff@gmail.com"),
+                ),
+                ListTile(
+                  title: Text("레포지토리"),
+                  subtitle: Text("https://github.com/JAICHANGPARK"),
+                ),
+              ],
             ),
-            ListTile(
-              title: Text("주소"),
-              subtitle: Text("aristojeff@gmail.com"),
-            ),
-
+           
+            
           ],
         ),
       ),
@@ -131,9 +141,10 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Card(
               child: Container(
-                height: MediaQuery.of(context).size.height / 3.2,
+                height: MediaQuery.of(context).size.height / 2.5,
                 padding: EdgeInsets.all(16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text("검색정보 입력"),
                     Expanded(
@@ -143,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
+                              controller: latTextController,
                               decoration: InputDecoration(
                                   labelText: "위도",
                                   hintText: "37.xxx"
@@ -159,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
+                              controller: lngTextController,
                               decoration: InputDecoration(
                                   labelText: "경도",
                                   hintText: "127.xxx"
@@ -175,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
+                              controller: rangeTextController,
                               decoration: InputDecoration(
                                 labelText: "반경(m)",
                                 hintText: "10m"
@@ -183,7 +197,29 @@ class _MyHomePageState extends State<MyHomePage> {
                           )
                         ],
                       ),
-                    )
+                    ),
+                  ButtonBar(
+                    children: <Widget>[
+                      MaterialButton(
+                        child: Text('검색'),
+                        onPressed: (){
+                          
+                          String lat=latTextController.text;
+                          String lng =lngTextController.text;
+                          String r = rangeTextController.text;
+                          
+                          if(lat.length > 0 && lng.length > 0 && r.length > 0){
+                            
+                          }else{
+                            showDialog(context: context, builder: (context)=>AlertDialog(
+                              content: Text("모든 조건을 입력해주세요"),
+                            ));
+                          }
+                        },
+                        color: Colors.teal,
+                      )
+                    ],
+                  )
                   ],
                 ),
               ),
@@ -208,7 +244,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           return Card(
                             color: stores[index].soldOut? Colors.grey: Colors.white,
                             child: Container(
-
                               margin: EdgeInsets.only(bottom: 16),
                               padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
                               child: Column(
