@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
       theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -139,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             ListTile(
               title: Text('마스크5부제 정보'),
+              leading: Icon(Icons.info_outline),
             ),
             Divider(
               height: 0,
@@ -146,17 +148,26 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text('공적마스크 구매 안내'),
-                onTap: (){
+              onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => InformationWebViewPage(url: "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092")
-                ));
-                },
+                    builder: (context) => InformationWebViewPage(
+                        url:
+                            "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
+                      title: "공적마스크 구매 안내",)));
+              },
             ),
             ListTile(
-              title: Text('마스크5부제'),
-            ),
+                title: Text('마스크 사용 권고사항'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => InformationWebViewPage(
+                          url:
+                              "https://www.mfds.go.kr/brd/m_99/view.do?seq=43955",
+                      title: "마스크 사용 권고사항",)));
+                }),
             ListTile(
               title: Text('정보'),
+              leading: Icon(Icons.info_outline),
             ),
             Divider(
               height: 0,
@@ -179,7 +190,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-
+            ListTile(
+              title: Text('앱정보'),
+              onTap: (){
+                showAboutDialog(context: context);
+              },
+            ),
           ],
         ),
       ),
@@ -368,6 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: (newValue) {
             setState(() {
               pageIndex = newValue;
+
             });
           },
           items: [
@@ -378,11 +395,21 @@ class _MyHomePageState extends State<MyHomePage> {
           ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            if (stores != null) {
-              stores.clear();
-            }
-          });
+          if(appPublishFlag){
+            setState(() {
+              if (stores != null) {
+                stores.clear();
+              }
+            });
+          }else{
+
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  content:
+                  Text("현재 이용할 수 없습니다."),
+                ));
+          }
         },
         tooltip: 'Refresh',
         child: Icon(Icons.refresh),
