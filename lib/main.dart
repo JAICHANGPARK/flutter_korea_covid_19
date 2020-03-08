@@ -233,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height / 1.5,
+                  height: MediaQuery.of(context).size.height / 2.6,
                   width: MediaQuery.of(context).size.width,
                   child: FutureBuilder<Mask>(
                     future: getMask(latTextController.text,
