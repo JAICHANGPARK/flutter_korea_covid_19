@@ -21,13 +21,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       title: '공적마스크 검색이',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.teal,
-        accentColor: Colors.red
-      ),
+          primarySwatch: Colors.blue,
+          primaryColor: Colors.teal,
+          accentColor: Colors.red),
       home: MyHomePage(title: '공적마스크 검색'),
     );
   }
@@ -43,14 +41,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  var box;
+  int pageIndex = 0;
   Mask resultList;
   List<Stores> stores;
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
-  var box;
-  int pageIndex = 0;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -66,17 +63,17 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<Recent> getSearchLog() async{
+  Future<Recent> getSearchLog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lat = prefs.getString('recent_lat')?? "";
-    String lng = prefs.getString('recent_lng')?? "";
-    String range = prefs.getString('recent_range')?? "";
-    String dt = prefs.getString('recent_datetime')?? "";
+    String lat = prefs.getString('recent_lat') ?? "";
+    String lng = prefs.getString('recent_lng') ?? "";
+    String range = prefs.getString('recent_range') ?? "";
+    String dt = prefs.getString('recent_datetime') ?? "";
     Recent tmp = Recent(lat, lng, range, dt);
     return tmp;
   }
 
-  Future<void> setSearchLog(String lat, String lng, String range) async{
+  Future<void> setSearchLog(String lat, String lng, String range) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('recent_lat', lat);
     await prefs.setString('recent_lng', lng);
@@ -84,21 +81,17 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString('recent_datetime', DateTime.now().toString());
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getSearchLog().then((r){
+    getSearchLog().then((r) {
       print(r);
       latTextController.text = r.lat;
       lngTextController.text = r.lng;
       rangeTextController.text = r.range;
-      setState(() {
-
-      });
+      setState(() {});
     });
-
   }
 
   @override
@@ -158,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(flex: 2, child: Text('위도')),
                               Expanded(
                                 flex: 8,
-                                child: TextField( keyboardType: TextInputType.number,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
                                   controller: latTextController,
                                   decoration: InputDecoration(
                                       labelText: "위도", hintText: "37.xxx"),
@@ -189,7 +183,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(flex: 2, child: Text('검색 반경')),
                               Expanded(
                                 flex: 8,
-                                child: TextField( keyboardType: TextInputType.number,
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
                                   controller: rangeTextController,
                                   decoration: InputDecoration(
                                       labelText: "반경(m)", hintText: "10m"),
@@ -215,7 +210,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     getMask(lat, lng, r);
                                   }
                                   setSearchLog(lat, lng, r);
-
                                 } else {
                                   showDialog(
                                       context: context,
@@ -307,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       )),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: pageIndex,
+          currentIndex: pageIndex,
           onTap: (newValue) {
             setState(() {
               pageIndex = newValue;
