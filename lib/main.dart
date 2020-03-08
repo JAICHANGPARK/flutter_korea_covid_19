@@ -209,7 +209,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           String r = rangeTextController.text;
                           
                           if(lat.length > 0 && lng.length > 0 && r.length > 0){
-                            
+                            if(stores.length > 0){
+                              stores.clear();
+                              getMask(lat, lng, r);
+                            }
+
                           }else{
                             showDialog(context: context, builder: (context)=>AlertDialog(
                               content: Text("모든 조건을 입력해주세요"),
@@ -228,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width,
               child: FutureBuilder<Mask>(
-                future: getMask(),
+                future: getMask(latTextController.text, lngTextController.text, rangeTextController.text),
                 builder: (context, snapshot) {
                   if (snapshot.data == null)
                     return Center(
