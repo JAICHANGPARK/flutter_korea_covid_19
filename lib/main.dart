@@ -7,6 +7,7 @@ import 'package:fluttermasktest/model/mask.dart';
 import 'package:fluttermasktest/model/recent.dart';
 import 'package:fluttermasktest/model/search.dart';
 import 'package:fluttermasktest/ui/common/notification_item.dart';
+import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
@@ -137,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             ListTile(
-              title: Text('마스크5부제'),
+              title: Text('마스크5부제 정보'),
             ),
             Divider(
               height: 0,
@@ -145,7 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text('공적마스크 구매 안내'),
-              trailing: Icon(Icons.keyboard),
+                onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => InformationWebViewPage(url: "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092")
+                ));
+                },
             ),
             ListTile(
               title: Text('마스크5부제'),
