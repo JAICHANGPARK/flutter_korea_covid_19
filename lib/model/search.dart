@@ -1,7 +1,5 @@
 import 'package:hive/hive.dart';
 
-part 'search.g.dart';
-
 @HiveType(typeId: 0)
 class Search{
   @HiveField(0)
