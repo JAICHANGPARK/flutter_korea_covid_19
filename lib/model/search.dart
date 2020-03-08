@@ -1,15 +1,17 @@
 import 'package:hive/hive.dart';
 
+part 'search.g.dart';
+
 @HiveType(typeId: 0)
 class Search{
   @HiveField(0)
-  String lat;
+  final String lat;
   @HiveField(1)
-  String lng;
+  final String lng;
   @HiveField(2)
-  String range;
+  final String range;
   @HiveField(3)
-  String datetime;
+  final  String datetime;
 
   Search(this.lat, this.lng, this.range, this.datetime);
 

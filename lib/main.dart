@@ -8,9 +8,10 @@ import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
-  final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+void main() async {
+  final appDocumentDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
   runApp(MyApp());
 }
@@ -85,8 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState()  {
     // TODO: implement initState
     super.initState();
-    var path = Directory.current.path;
-    Hive..init(path);
 
 //    Hive.openBox('testBox').then((r) => box = r);
 
@@ -218,11 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 getMask(lat, lng, r);
                               }
 
-                              var person = Search()
-                                ..lat = lat
-                                ..lng = lng
-                                ..range = r
-                                ..datetime = DateTime.now().toString();
+                              var person = Search(lat,lng,r, DateTime.now().toString());
                               Hive.openBox('myBox').then((b) {
 //                                var box = Hive.box('myBox');
                                 b.put('search', person);
@@ -327,5 +322,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Icon(Icons.refresh),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+
+
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    Hive.close();
+    super.dispose();
+
   }
 }
