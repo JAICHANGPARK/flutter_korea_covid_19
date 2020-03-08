@@ -191,7 +191,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text("태어난 년도 입력 및 수정"),
-              subtitle: Text("마스크 5부제 요일 확인을 위한 정보입니다."),
+              subtitle: Text("마스크 5부제 요일 확인을 위한 정보입니다.",style: TextStyle(
+                  fontSize: 12
+              ),),
               onTap: () {
                 setState(() {
                   pageIndex = 2;
@@ -230,6 +232,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 showAboutDialog(context: context);
               },
             ),
+            ListTile(
+              title: Text("유의사항"),
+              subtitle: Text("5분 이상 전의 데이터로 실제 재고와 다를 수 있습니다",style: TextStyle(
+                fontSize: 12
+              ),),
+            )
           ],
         ),
       ),
@@ -419,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "태여난 년도",
+                    "태어난 연도",
                     style: GoogleFonts.roboto(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -464,6 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 onPressed: () {
                                   if (birthTextController.text.length > 0 &&
                                       birthTextController.text.length == 4) {
+                                    FocusScope.of(context).unfocus();
                                     print(birthTextController.text[3]);
                                     int num =
                                         int.parse(birthTextController.text[3]);
