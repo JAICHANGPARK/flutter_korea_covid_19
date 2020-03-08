@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttermasktest/model/mask.dart';
 import 'package:fluttermasktest/model/recent.dart';
 import 'package:fluttermasktest/model/search.dart';
 import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
@@ -50,9 +52,11 @@ class _MyHomePageState extends State<MyHomePage> {
   bool appPublishFlag = false;
   Mask resultList;
   List<Stores> stores;
+  String userDay = "";
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
+  TextEditingController birthTextController = TextEditingController();
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -128,12 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -151,9 +149,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => InformationWebViewPage(
-                        url:
-                            "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
-                      title: "공적마스크 구매 안내",)));
+                          url:
+                              "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
+                          title: "공적마스크 구매 안내",
+                        )));
               },
             ),
             ListTile(
@@ -161,10 +160,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => InformationWebViewPage(
-                          url:
-                              "https://www.mfds.go.kr/brd/m_99/view.do?seq=43955",
-                      title: "마스크 사용 권고사항",)));
+                            url:
+                                "https://www.mfds.go.kr/brd/m_99/view.do?seq=43955",
+                            title: "마스크 사용 권고사항",
+                          )));
                 }),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text("설정"),
+            ),
+            Divider(
+              height: 0,
+              thickness: 1.2,
+            ),
+            ListTile(
+              title: Text("태어난 년도 입력 및 수정"),
+              subtitle: Text("마스크 5부제 요일 확인을 위한 정보입니다."),
+              onTap: () {
+                setState(() {
+                  pageIndex = 2;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
             ListTile(
               title: Text('정보'),
               leading: Icon(Icons.info_outline),
@@ -192,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: Text('앱정보'),
-              onTap: (){
+              onTap: () {
                 showAboutDialog(context: context);
               },
             ),
@@ -200,17 +218,18 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+        ),
       ),
-      body: SingleChildScrollView(
-          child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IndexedStack(
-          index: pageIndex,
-          children: <Widget>[
-            !appPublishFlag
-                ? NotificationItem()
-                : Column(
+      body: IndexedStack(
+        index: pageIndex,
+        children: <Widget>[
+          !appPublishFlag
+              ? NotificationItem()
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
                     children: <Widget>[
                       Card(
                         child: Container(
@@ -369,22 +388,135 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Center(
-                child: Text("업데이트 예정"),
+                ),
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Text("업데이트 예정"),
+            ),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "태여난 년도",
+                    style: GoogleFonts.roboto(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Card(
+                    elevation: 4,
+                    child: Container(
+                      padding: EdgeInsets.all(16),
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "출생연도를 입력해주세요",
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          TextField(
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(fontSize: 24),
+                            maxLength: 4,
+                            controller: birthTextController,
+                            inputFormatters: [
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "출생연도 4자리",
+                                hintText: "19xx",
+                                suffix: Text("년")),
+                          ),
+                          ButtonBar(
+                            children: <Widget>[
+                              MaterialButton(
+                                color: Colors.teal,
+                                onPressed: () {
+                                  int num =
+                                      int.parse(birthTextController.text[3]);
+                                  if (num == 1 && num == 6) {
+                                    userDay = "월";
+                                  } else if (num == 2 && num == 7) {
+                                    userDay = "화";
+                                  } else if (num == 3 && num == 8) {
+                                    userDay = "수";
+                                  } else if (num == 4 && num == 9) {
+                                    userDay = "목";
+                                  } else if (num == 5 && num == 0) {
+                                    userDay = "금";
+                                  }
+                                  setState(() {});
+                                },
+                                child: Text('적용'),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Text(
+                    "구매가능요일",
+                    style: GoogleFonts.roboto(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "평일에 구매하지 못하였다면 주말(토,일)에 구매가능합니다.",
+                    style: GoogleFonts.roboto(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Card(
+                    elevation: 4,
+                    child: Container(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              "매주",
+                              style: GoogleFonts.roboto(fontSize: 48),
+                            ),
+                            Text(
+                              userDay,
+                              style: GoogleFonts.roboto(fontSize: 84),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
-        ),
-      )),
+            ),
+          )
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: pageIndex,
           onTap: (newValue) {
             setState(() {
               pageIndex = newValue;
-
             });
           },
           items: [
@@ -392,28 +524,30 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.search), title: Text("약국목록")),
             BottomNavigationBarItem(
                 icon: Icon(Icons.list), title: Text("검색기록")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
           ]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if(appPublishFlag){
-            setState(() {
-              if (stores != null) {
-                stores.clear();
-              }
-            });
-          }else{
-
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  content:
-                  Text("현재 이용할 수 없습니다."),
-                ));
-          }
-        },
-        tooltip: 'Refresh',
-        child: Icon(Icons.refresh),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: pageIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                if (appPublishFlag) {
+                  setState(() {
+                    if (stores != null) {
+                      stores.clear();
+                    }
+                  });
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            content: Text("현재 이용할 수 없습니다."),
+                          ));
+                }
+              },
+              tooltip: 'Refresh',
+              child: Icon(Icons.refresh),
+            )
+          : null, // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 

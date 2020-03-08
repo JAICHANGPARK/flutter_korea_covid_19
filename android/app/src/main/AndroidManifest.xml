@@ -10,7 +10,7 @@
     <application
         android:usesCleartextTraffic="true"
         android:name="io.flutter.app.FlutterApplication"
-        android:label="fluttermasktest"
+        android:label="공적마스크 검색이"
         android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
