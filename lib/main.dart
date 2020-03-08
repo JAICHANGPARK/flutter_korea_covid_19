@@ -136,6 +136,27 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
+            ListTile(
+              title: Text('마스크5부제'),
+            ),
+            Divider(
+              height: 0,
+              thickness: 1.2,
+            ),
+            ListTile(
+              title: Text('공적마스크 구매 안내'),
+              trailing: Icon(Icons.keyboard),
+            ),
+            ListTile(
+              title: Text('마스크5부제'),
+            ),
+            ListTile(
+              title: Text('정보'),
+            ),
+            Divider(
+              height: 0,
+              thickness: 1.2,
+            ),
             ExpansionTile(
               title: Text("개발자 정보"),
               children: <Widget>[
@@ -153,6 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
+
           ],
         ),
       ),

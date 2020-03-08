@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationItem extends StatelessWidget {
   @override
@@ -12,7 +13,10 @@ class NotificationItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("밤낮으로 고생하시는 우리나라 모든 약사님들께 감사의 인사를 드립니다."),
+              Text(
+                "우리나라 모든 약사님들께 감사의 인사를 드립니다.",
+                style: GoogleFonts.nanumPenScript(fontSize: 28),
+              ),
               Image.network(
                 "https://assets-ouch.icons8.com/thumb/676/f10310c4-3d7d-4e98-8541-1ea864393a04.png",
                 loadingBuilder: (BuildContext context, Widget child,

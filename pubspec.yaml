@@ -27,6 +27,9 @@ dependencies:
   hive_flutter: ^0.3.0+2
   path_provider: any
   shared_preferences: ^0.5.6
+  google_fonts: any
+  webview_flutter: ^0.3.19+9
+
   firebase_remote_config: ^0.3.0+3
 
 dev_dependencies:
