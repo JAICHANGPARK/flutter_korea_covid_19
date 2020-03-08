@@ -465,6 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           TextField(
                             keyboardType: TextInputType.number,
                             style: TextStyle(fontSize: 24),
+                            autofocus: false,
                             maxLength: 4,
                             controller: birthTextController,
                             inputFormatters: [
