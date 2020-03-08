@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermasktest/model/mask.dart';
+import 'package:fluttermasktest/model/recent.dart';
 import 'package:fluttermasktest/model/search.dart';
 import 'package:hive/hive.dart';
 
@@ -62,15 +63,38 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<List<Search>> getSearchLog(){
+  Future<Recent> getSearchLog() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lat = prefs.getString('recent_lat')?? "";
+    String lng = prefs.getString('recent_lng')?? "";
+    String range = prefs.getString('recent_rannge')?? "";
+    String dt = prefs.getString('recent_datetime')?? "";
+    Recent tmp = Recent(lat, lng, range, dt);
+    return tmp;
   }
+
+  Future<void> setSearchLog(String lat, String lng, String range) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('recent_lat', lat);
+    await prefs.setString('recent_lng', lng);
+    await prefs.setString('recent_rannge', range);
+    await prefs.setString('recent_datetime', DateTime.now().toString());
+  }
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getSearchLog().then((r){
+      print(r);
+      latTextController.text = r.lat;
+      lngTextController.text = r.lng;
+      rangeTextController.text = r.range;
+      setState(() {
 
+      });
+    });
 
   }
 
@@ -186,6 +210,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     stores.clear();
                                     getMask(lat, lng, r);
                                   }
+                                  setSearchLog(lat, lng, r);
+
                                 } else {
                                   showDialog(
                                       context: context,
@@ -269,6 +295,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
+              child: Center(
+                child: Text("업데이트 예정"),
+              ),
             )
           ],
         ),
