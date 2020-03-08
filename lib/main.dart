@@ -419,8 +419,16 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: Center(
-              child: Text("업데이트 예정"),
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.network("https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
+                Center(
+                  child: Text("업데이트 예정"),
+                ),
+              ],
             ),
           ),
           SingleChildScrollView(
@@ -568,7 +576,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               });
             }
-
             setState(() {
               pageIndex = newValue;
             });
