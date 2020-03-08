@@ -90,6 +90,17 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString('recent_datetime', DateTime.now().toString());
   }
 
+  Future<void> setUserBirth(String b) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_birth', b);
+  }
+
+  Future<String> getUserBirth() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String birth = prefs.getString('user_birth') ?? "";
+    return birth;
+  }
+
   Future<bool> getPublishState() async {
     final RemoteConfig remoteConfig = await RemoteConfig.instance;
     final defaults = <String, dynamic>{'welcome': 'default welcome'};
@@ -120,7 +131,12 @@ class _MyHomePageState extends State<MyHomePage> {
           latTextController.text = r.lat;
           lngTextController.text = r.lng;
           rangeTextController.text = r.range;
-          setState(() {});
+
+          getUserBirth().then((value) {
+            setState(() {
+              userDay = value;
+            });
+          });
         });
       } else {
         setState(() {
@@ -446,20 +462,33 @@ class _MyHomePageState extends State<MyHomePage> {
                               MaterialButton(
                                 color: Colors.teal,
                                 onPressed: () {
-                                  int num =
-                                      int.parse(birthTextController.text[3]);
-                                  if (num == 1 && num == 6) {
-                                    userDay = "월";
-                                  } else if (num == 2 && num == 7) {
-                                    userDay = "화";
-                                  } else if (num == 3 && num == 8) {
-                                    userDay = "수";
-                                  } else if (num == 4 && num == 9) {
-                                    userDay = "목";
-                                  } else if (num == 5 && num == 0) {
-                                    userDay = "금";
+                                  if (birthTextController.text.length > 0 &&
+                                      birthTextController.text.length == 4) {
+                                    print(birthTextController.text[3]);
+                                    int num =
+                                        int.parse(birthTextController.text[3]);
+                                    setUserBirth(birthTextController.text);
+                                    setState(() {
+                                      if (num == 1 || num == 6) {
+                                        userDay = "월";
+                                      } else if (num == 2 || num == 7) {
+                                        userDay = "화";
+                                      } else if (num == 3 || num == 8) {
+                                        userDay = "수";
+                                      } else if (num == 4 || num == 9) {
+                                        userDay = "목";
+                                      } else if (num == 5 || num == 0) {
+                                        userDay = "금";
+                                      }
+                                      print(userDay);
+                                    });
+                                  } else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                              content: Text("4자리 출생연도를 입력해주세요"),
+                                            ));
                                   }
-                                  setState(() {});
                                 },
                                 child: Text('적용'),
                               )
