@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermasktest/model/mask.dart';
+import 'package:fluttermasktest/model/search.dart';
+import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
+  final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDir.path);
   runApp(MyApp());
 }
 
@@ -57,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
+  var box;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -66,7 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
       Mask m = Mask.fromJson(json.decode(utf8.decode(response.bodyBytes)));
-
       return m;
     } else {
       return null;
@@ -76,9 +82,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void initState() {
+  void initState()  {
     // TODO: implement initState
     super.initState();
+    var path = Directory.current.path;
+    Hive..init(path);
+
+//    Hive.openBox('testBox').then((r) => box = r);
+
 //    getMask().then((r) {
 //      setState(() {
 //        resultList = r;
@@ -126,8 +137,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-           
-            
           ],
         ),
       ),
@@ -156,9 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: TextField(
                               controller: latTextController,
                               decoration: InputDecoration(
-                                  labelText: "위도",
-                                  hintText: "37.xxx"
-                              ),
+                                  labelText: "위도", hintText: "37.xxx"),
                             ),
                           )
                         ],
@@ -173,9 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: TextField(
                               controller: lngTextController,
                               decoration: InputDecoration(
-                                  labelText: "경도",
-                                  hintText: "127.xxx"
-                              ),
+                                  labelText: "경도", hintText: "127.xxx"),
                             ),
                           )
                         ],
@@ -190,40 +195,54 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: TextField(
                               controller: rangeTextController,
                               decoration: InputDecoration(
-                                labelText: "반경(m)",
-                                hintText: "10m"
-                              ),
+                                  labelText: "반경(m)", hintText: "10m"),
                             ),
                           )
                         ],
                       ),
                     ),
-                  ButtonBar(
-                    children: <Widget>[
-                      MaterialButton(
-                        child: Text('검색'),
-                        onPressed: (){
-                          
-                          String lat=latTextController.text;
-                          String lng =lngTextController.text;
-                          String r = rangeTextController.text;
-                          
-                          if(lat.length > 0 && lng.length > 0 && r.length > 0){
-                            if(stores.length > 0){
-                              stores.clear();
-                              getMask(lat, lng, r);
-                            }
+                    ButtonBar(
+                      children: <Widget>[
+                        MaterialButton(
+                          child: Text('검색'),
+                          onPressed: ()  {
+                            String lat = latTextController.text;
+                            String lng = lngTextController.text;
+                            String r = rangeTextController.text;
 
-                          }else{
-                            showDialog(context: context, builder: (context)=>AlertDialog(
-                              content: Text("모든 조건을 입력해주세요"),
-                            ));
-                          }
-                        },
-                        color: Colors.teal,
-                      )
-                    ],
-                  )
+                            if (lat.length > 0 &&
+                                lng.length > 0 &&
+                                r.length > 0) {
+                              if (stores.length > 0) {
+                                stores.clear();
+                                getMask(lat, lng, r);
+                              }
+
+                              var person = Search()
+                                ..lat = lat
+                                ..lng = lng
+                                ..range = r
+                                ..datetime = DateTime.now().toString();
+                              Hive.openBox('myBox').then((b) {
+//                                var box = Hive.box('myBox');
+                                b.put('search', person);
+                                print(b.get('search')); // Dave: 22
+
+                              });
+
+
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                        content: Text("모든 조건을 입력해주세요"),
+                                      ));
+                            }
+                          },
+                          color: Colors.teal,
+                        )
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -232,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
               height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width,
               child: FutureBuilder<Mask>(
-                future: getMask(latTextController.text, lngTextController.text, rangeTextController.text),
+                future: getMask(latTextController.text, lngTextController.text,
+                    rangeTextController.text),
                 builder: (context, snapshot) {
                   if (snapshot.data == null)
                     return Center(
@@ -242,14 +262,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     resultList = snapshot.data;
                     stores = resultList.stores;
                     return ListView.builder(
-                      shrinkWrap: true,
+                        shrinkWrap: true,
                         itemCount: stores.length,
                         itemBuilder: (context, index) {
                           return Card(
-                            color: stores[index].soldOut? Colors.grey: Colors.white,
+                            color: stores[index].soldOut
+                                ? Colors.grey
+                                : Colors.white,
                             child: Container(
                               margin: EdgeInsets.only(bottom: 16),
-                              padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
+                              padding:
+                                  EdgeInsets.only(left: 16, top: 16, bottom: 8),
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -261,7 +284,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     "주소 : ${stores[index].addr}",
                                     style: TextStyle(fontSize: 12),
                                   ),
-                                  Text("판매 수량 : ${stores[index].soldCnt.toString()}개"),
+                                  Text(
+                                      "판매 수량 : ${stores[index].soldCnt.toString()}개"),
                                   stores[index].soldOut
                                       ? Text("재고여부 : 매진")
                                       : Text("재고여부 : 재고있음(확인필요)"),
@@ -287,18 +311,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       )),
-     bottomNavigationBar: BottomNavigationBar(
-       items: [
-         BottomNavigationBarItem(
-           icon: Icon(Icons.search),
-           title: Text("약국목록")
-         ),
-         BottomNavigationBarItem(
-           icon: Icon(Icons.list),
-           title: Text("검색기록")
-         ),
-       ]
-     ),
+      bottomNavigationBar: BottomNavigationBar(items: [
+        BottomNavigationBarItem(icon: Icon(Icons.search), title: Text("약국목록")),
+        BottomNavigationBarItem(icon: Icon(Icons.list), title: Text("검색기록")),
+      ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
