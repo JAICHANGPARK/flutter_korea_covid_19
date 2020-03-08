@@ -54,6 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Mask resultList;
   List<Stores> stores;
+  TextEditingController latTextController = TextEditingController();
+  TextEditingController lngTextController = TextEditingController();
+  TextEditingController rangeTextController = TextEditingController();
 
   Future<Mask> getMask() async {
     var url =
@@ -113,7 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text("주소"),
               subtitle: Text("aristojeff@gmail.com"),
-            )
+            ),
+
           ],
         ),
       ),
@@ -127,10 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Card(
               child: Container(
-                height: MediaQuery.of(context).size.height / 4,
+                height: MediaQuery.of(context).size.height / 3.2,
                 padding: EdgeInsets.all(16),
                 child: Column(
                   children: <Widget>[
+                    Text("검색정보 입력"),
                     Expanded(
                       child: Row(
                         children: <Widget>[
@@ -138,7 +143,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
-                              decoration: InputDecoration(),
+                              decoration: InputDecoration(
+                                  labelText: "위도",
+                                  hintText: "37.xxx"
+                              ),
                             ),
                           )
                         ],
@@ -151,7 +159,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
-                              decoration: InputDecoration(),
+                              decoration: InputDecoration(
+                                  labelText: "경도",
+                                  hintText: "127.xxx"
+                              ),
                             ),
                           )
                         ],
@@ -164,7 +175,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             flex: 8,
                             child: TextField(
-                              decoration: InputDecoration(),
+                              decoration: InputDecoration(
+                                labelText: "반경(m)",
+                                hintText: "10m"
+                              ),
                             ),
                           )
                         ],
@@ -175,29 +189,45 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Container(
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width,
               child: FutureBuilder<Mask>(
                 future: getMask(),
                 builder: (context, snapshot) {
+                  if (snapshot.data == null)
+                    return Center(
+                      child: Text("다시 시도해주세요 "),
+                    );
                   if (snapshot.hasData) {
                     resultList = snapshot.data;
                     stores = resultList.stores;
                     return ListView.builder(
+                      shrinkWrap: true,
                         itemCount: stores.length,
                         itemBuilder: (context, index) {
                           return Card(
+                            color: stores[index].soldOut? Colors.grey: Colors.white,
                             child: Container(
-                              height: 108,
+
                               margin: EdgeInsets.only(bottom: 16),
+                              padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
                               child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text(stores[index].addr),
-                                  Text(stores[index].name),
-                                  Text(stores[index].soldCnt.toString()),
-                                  Text(stores[index].soldOut.toString()),
-                                  Text("재고수량: ${stores[index].stockCnt.toString()}")
+                                  Text(
+                                      "약국 이름: ${stores[index].name.substring(6)}"),
+                                  Text(
+                                    "주소 : ${stores[index].addr}",
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  Text("판매 수량 : ${stores[index].soldCnt.toString()}개"),
+                                  stores[index].soldOut
+                                      ? Text("재고여부 : 매진")
+                                      : Text("재고여부 : 재고있음(확인필요)"),
+                                  Text(
+                                      "재고수량: ${stores[index].stockCnt.toString()}개")
                                 ],
                               ),
                             ),
@@ -206,11 +236,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   } else {
                     return Center(
                         child: Column(
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            Text("정보요청중...")
-                          ],
-                        ));
+                      children: <Widget>[
+                        CircularProgressIndicator(),
+                        Text("정보요청중...")
+                      ],
+                    ));
                   }
                 },
               ),
@@ -221,10 +251,9 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            if(stores != null){
+            if (stores != null) {
               stores.clear();
             }
-
           });
         },
         tooltip: 'Refresh',
