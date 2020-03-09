@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,6 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
   TextEditingController birthTextController = TextEditingController();
+
+  Location location = new Location();
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -124,10 +130,42 @@ class _MyHomePageState extends State<MyHomePage> {
     return tmp == "0" ? false : true;
   }
 
+  Future<void> checkLocationServiceEnable() async {
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+  }
+
+  Future<bool> checkLocationPermission() async {
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.DENIED) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.GRANTED) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    checkLocationServiceEnable()
+        .then((value) => checkLocationPermission().then((r) async {
+              if (r) {
+                _locationData = await location.getLocation();
+                print(_locationData.latitude);
+                print(_locationData.longitude);
+              }
+            }));
+
     getPublishState().then((result) {
       if (result) {
         setState(() {
@@ -424,7 +462,8 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.network("https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
+                Image.network(
+                    "https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
                 Center(
                   child: Text("업데이트 예정"),
                 ),
