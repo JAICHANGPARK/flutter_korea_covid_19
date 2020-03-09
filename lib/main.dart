@@ -69,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, double> currentLocation;
   StreamSubscription<LocationData> locationSubscription;
   String error;
+  bool userServiceAgree = false;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -111,15 +112,24 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<String> getUserBirth() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String birth = prefs.getString('user_birth') ?? "";
-
     return birth;
   }
 
   Future<String> getUserDay() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String day = prefs.getString('user_day') ?? "";
-
     return day;
+  }
+
+  Future<void> setUserServiceAgree(bool b) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('user_agree', b);
+  }
+
+  Future<bool> getUserServiceAgree() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool agree = prefs.getBool('user_agree') ?? false;
+    return agree;
   }
 
   Future<bool> getPublishState() async {
@@ -172,7 +182,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print("원래 권한 허용되어잇음.");
       return true;
     }
-
   }
 
   void initPlatformState() async {
@@ -201,36 +210,84 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
 
-    checkLocationPermission().then((result) async{
-      print(result);
-      initPlatformState();
-      if(result){
-        _locationData = await location.getLocation();
-      }
-    });
-
-    locationSubscription = location.onLocationChanged().listen((result) {
-      setState(() {
-        _locationData = result;
-      });
-    });
-
-
-    getPublishState().then((result) {
-      if (result) {
-        setState(() {
-          appPublishFlag = true;
+    getUserServiceAgree().then((v) async {
+      if (v) {
+        checkLocationPermission().then((result) async {
+          print(result);
+          initPlatformState();
+          if (result) {
+            _locationData = await location.getLocation();
+          }
         });
 
-        getSearchLog().then((r) {
-          latTextController.text = r.lat;
-          lngTextController.text = r.lng;
-          rangeTextController.text = r.range;
+        locationSubscription = location.onLocationChanged().listen((result) {
+          setState(() {
+            _locationData = result;
+          });
+        });
+
+        getPublishState().then((result) {
+          if (result) {
+            setState(() {
+              appPublishFlag = true;
+            });
+
+            getSearchLog().then((r) {
+              latTextController.text = r.lat;
+              lngTextController.text = r.lng;
+              rangeTextController.text = r.range;
+            });
+          } else {
+            setState(() {
+              appPublishFlag = false;
+            });
+          }
         });
       } else {
-        setState(() {
-          appPublishFlag = false;
-        });
+        await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return WillPopScope(
+                onWillPop: () {},
+                child: SimpleDialog(
+                  contentPadding: EdgeInsets.all(16),
+                  children: <Widget>[
+                    Text(
+                        "1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분 이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
+                    Text(
+                        "2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 오른쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
+                    Text("3. 위치정보는 주변 약국을 검색하기 위해 사용됩니다."),
+                    Text("4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다."),
+                    Text(
+                        "5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    MaterialButton(
+                      color: Colors.teal,
+                      onPressed: () {
+                        setState(() {
+                          userServiceAgree = true;
+                        });
+                        setUserServiceAgree(userServiceAgree);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        "동의합니다.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  ],
+                  title: Text("서비스 사용 동의"),
+                ),
+              );
+            });
+
+        print("동의완료 처리후 : $userServiceAgree");
       }
     });
   }
@@ -328,6 +385,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 "5분 이상 전의 데이터로 실제 재고와 다를 수 있습니다",
                 style: TextStyle(fontSize: 12),
               ),
+            ),
+            ListTile(
+              title: Text("서비스 이용 동의"),
+              subtitle: userServiceAgree
+                  ? Text(
+                      "사용 동의 처리 완료",
+                      style: TextStyle(fontSize: 12),
+                    )
+                  : Text(
+                      "사용 동의 미완료",
+                      style: TextStyle(fontSize: 12),
+                    ),
             )
           ],
         ),
@@ -345,10 +414,15 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: <Widget>[
                 Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text("검색정보 입력"),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "검색정보 입력",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
 //                        Expanded(
 //                          child: Row(
 //                            children: <Widget>[
@@ -383,66 +457,77 @@ class _MyHomePageState extends State<MyHomePage> {
 //                            ],
 //                          ),
 //                        ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(flex: 2, child: Text('검색 반경')),
-                          Expanded(
-                            flex: 8,
-                            child: TextField(
-                              inputFormatters: [
-                                WhitelistingTextInputFormatter.digitsOnly
-                              ],
-                              keyboardType: TextInputType.number,
-                              controller: rangeTextController,
-                              decoration: InputDecoration(
-                                  labelText: "반경(m)",
-                                  hintText: "10m(최대 10000m)"),
-                              onChanged: (value){
-                                if(int.parse(value) > 10000){
-                                  rangeTextController.text = "10000";
-                                }
-                              },
-
+                        SizedBox(
+                          height: 16,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(flex: 2, child: Text('검색 반경')),
+                            SizedBox(
+                              width: 8,
                             ),
-                          )
-                        ],
-                      ),
-                      ButtonBar(
-                        children: <Widget>[
-                          MaterialButton(
-                            child: Text('검색'),
-                            onPressed: () {
+                            Expanded(
+                              flex: 8,
+                              child: TextField(
+                                autofocus: false,
+                                inputFormatters: [
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
+                                keyboardType: TextInputType.number,
+                                controller: rangeTextController,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "반경(m)",
+                                    hintText: "10m(최대 10000m)"),
+                                onChanged: (value) {
+                                  if (int.parse(value) > 10000) {
+                                    rangeTextController.text = "10000";
+                                  }
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                        ButtonBar(
+                          children: <Widget>[
+                            MaterialButton(
+                              child: Text('검색'),
+                              onPressed: () {
+                                FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
-                              String r = rangeTextController.text;
+                                String r = rangeTextController.text;
 
-                              if (
+                                if (
 //                              lat.length > 0 &&
 //                                  lng.length > 0 &&
-                              _locationData != null &&
-                                  r.length > 0) {
-                                print("latitude : ${_locationData.latitude.toString()}");
-                                print("longitude : ${_locationData.longitude.toString()}");
-                                if (stores.length > 0 && stores != null) {
-                                  stores.clear();
-                                  getMask(_locationData.latitude.toString(), _locationData.longitude.toString(), r);
+                                    _locationData != null && r.length > 0) {
+                                  print(
+                                      "latitude : ${_locationData.latitude.toString()}");
+                                  print(
+                                      "longitude : ${_locationData.longitude.toString()}");
+//                                  if (stores.length > 0 && stores != null) {
+//                                    stores.clear();
+//                                    getMask(_locationData.latitude.toString(), _locationData.longitude.toString(), r);
+//                                  }
+                                  setSearchLog(
+                                      _locationData.latitude.toString(),
+                                      _locationData.longitude.toString(),
+                                      r);
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                            content: Text("모든 조건을 입력해주세요"),
+                                          ));
                                 }
-
-                                setSearchLog(_locationData.latitude.toString(), _locationData.longitude.toString(), r);
-                              } else {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      content:
-                                      Text("모든 조건을 입력해주세요"),
-                                    ));
-                              }
-                            },
-                            color: Colors.teal,
-                          )
-                        ],
-                      )
-                    ],
+                              },
+                              color: Colors.teal,
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Container(
@@ -473,9 +558,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                       left: 16, top: 16, bottom: 8),
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
                                           "약국 이름: ${stores[index].name.substring(6)}"),
@@ -498,11 +583,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       } else {
                         return Center(
                             child: Column(
-                              children: <Widget>[
-                                CircularProgressIndicator(),
-                                Text("정보요청중...")
-                              ],
-                            ));
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Text("정보요청중...")
+                          ],
+                        ));
                       }
                     },
                   ),
