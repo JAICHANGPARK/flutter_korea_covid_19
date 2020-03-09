@@ -447,7 +447,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('앱정보'),
               onTap: () {
-                showAboutDialog(context: context);
+                showAboutDialog(context: context,
+                    applicationName: "공적마스크 검색이",
+                    applicationVersion: "1.1.1",
+                    applicationIcon: Image.asset('assets/icon/icons2/playstore.png', width: 64, height: 64,));
               },
             ),
             ListTile(
