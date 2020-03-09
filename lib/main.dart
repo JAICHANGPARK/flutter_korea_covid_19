@@ -264,22 +264,43 @@ class _MyHomePageState extends State<MyHomePage> {
                     SizedBox(
                       height: 16,
                     ),
-                    MaterialButton(
-                      color: Colors.teal,
-                      onPressed: () {
-                        setState(() {
-                          userServiceAgree = true;
-                        });
-                        setUserServiceAgree(userServiceAgree);
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(
-                        "동의합니다.",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    ButtonBar(
+                      children: <Widget>[
+                        MaterialButton(
+                          color: Colors.teal,
+                          onPressed: () {
+                            setState(() {
+                              userServiceAgree = false;
+                            });
+                            setUserServiceAgree(userServiceAgree);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            "동의하지 않습니다.",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
+                        MaterialButton(
+                          color: Colors.teal,
+                          onPressed: () {
+                            setState(() {
+                              userServiceAgree = true;
+                            });
+                            setUserServiceAgree(userServiceAgree);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            "동의합니다.",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                   title: Text("서비스 사용 동의"),
@@ -288,6 +309,42 @@ class _MyHomePageState extends State<MyHomePage> {
             });
 
         print("동의완료 처리후 : $userServiceAgree");
+        if (userServiceAgree) {
+          checkLocationPermission().then((result) async {
+            print(result);
+            initPlatformState();
+            if (result) {
+              _locationData = await location.getLocation();
+            }
+          });
+
+          locationSubscription = location.onLocationChanged().listen((result) {
+            setState(() {
+              _locationData = result;
+            });
+          });
+
+          getPublishState().then((result) {
+            if (result) {
+              setState(() {
+                appPublishFlag = true;
+              });
+
+              getSearchLog().then((r) {
+                latTextController.text = r.lat;
+                lngTextController.text = r.lng;
+                rangeTextController.text = r.range;
+              });
+            } else {
+              setState(() {
+                appPublishFlag = false;
+              });
+            }
+          });
+        } else {
+          exit(0);
+          SystemNavigator.pop();
+        }
       }
     });
   }
@@ -327,6 +384,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: "마스크 사용 권고사항",
                           )));
                 }),
+            ListTile(
+                title: Text('[카드뉴스] 마스크 사용 권고사항'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => InformationWebViewPage(
+                        url:
+                        "http://blog.naver.com/kfdazzang/221837044802",
+                        title: "[카드뉴스] 마스크 사용 권고사항",
+                      )));
+                }),
+
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("설정"),
@@ -390,11 +458,11 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Text("서비스 이용 동의"),
               subtitle: userServiceAgree
                   ? Text(
-                      "사용 동의 처리 완료",
+                      "서비스 사용 동의 처리완료",
                       style: TextStyle(fontSize: 12),
                     )
                   : Text(
-                      "사용 동의 미완료",
+                      "서비스 사용 동의 미완료",
                       style: TextStyle(fontSize: 12),
                     ),
             )
@@ -409,7 +477,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(
         index: pageIndex,
         children: <Widget>[
-          SingleChildScrollView(
+         !appPublishFlag ? NotificationItem(): SingleChildScrollView(
             padding: EdgeInsets.all(8),
             child: Column(
               children: <Widget>[
@@ -595,6 +663,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+
 //          !appPublishFlag
 //              ? NotificationItem()
 //              : SingleChildScrollView(
