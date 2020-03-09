@@ -211,6 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     getUserServiceAgree().then((v) async {
+      userServiceAgree = v;
       if (v) {
         checkLocationPermission().then((result) async {
           print(result);
@@ -346,6 +347,8 @@ class _MyHomePageState extends State<MyHomePage> {
           SystemNavigator.pop();
         }
       }
+
+      setState(() {});
     });
   }
 
@@ -450,7 +453,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text("유의사항"),
               subtitle: Text(
-                "5분 이상 전의 데이터로 실제 재고와 다를 수 있습니다",
+                "5분 이상 전의 데이터로 실제 재고와 차이가 있을 수 있습니다",
                 style: TextStyle(fontSize: 12),
               ),
             ),
