@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -64,6 +65,10 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   LocationData _locationData;
+
+  Map<String, double> currentLocation;
+  StreamSubscription<LocationData> locationSubscription;
+  String error;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -141,15 +146,53 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<bool> checkLocationPermission() async {
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.DENIED) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.GRANTED) {
-        return true;
-      } else {
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
         return false;
       }
     }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.DENIED) {
+      print("원래 권한이 디나인");
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.GRANTED) {
+        print("요청하고 위치 권한 허용 안함");
+        _permissionGranted = await location.requestPermission();
+        return true;
+      } else {
+        print("요청하고 위치권한 허용함.");
+        return false;
+      }
+    } else if (_permissionGranted == PermissionStatus.DENIED_FOREVER) {
+      print("영원히 거부 ");
+    } else {
+      print("원래 권한 허용되어잇음.");
+    }
+    _locationData = await location.getLocation();
+  }
+
+  void initPlatformState() async {
+    LocationData myLocation;
+    try {
+      myLocation = await location.getLocation();
+      error = "";
+    } on PlatformException catch (e) {
+      if (e.code == 'PERMISSION_DENIED') {
+        error = "Permission Denied";
+      } else if (e.code == "PERMISSION_DENIED_NEVER_ASK") {
+        error = "Permission denied - please ask th user to enable ";
+      }
+      myLocation = null;
+    }
+
+    setState(() {
+      _locationData = myLocation;
+      print(_locationData.latitude);
+      print(_locationData.longitude);
+    });
   }
 
   @override
@@ -157,14 +200,17 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
 
-    checkLocationServiceEnable()
-        .then((value) => checkLocationPermission().then((r) async {
-              if (r) {
-                _locationData = await location.getLocation();
-                print(_locationData.latitude);
-                print(_locationData.longitude);
-              }
-            }));
+    checkLocationPermission().then((result) {
+      print(result);
+      initPlatformState();
+    });
+
+    locationSubscription = location.onLocationChanged().listen((result) {
+      setState(() {
+        _locationData = result;
+      });
+    });
+
 
     getPublishState().then((result) {
       if (result) {
