@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Stores> stores;
   String userDay = "";
   String userBirth = "";
+  String defaultRange = "100";
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
   TextEditingController rangeTextController = TextEditingController();
@@ -1002,7 +1003,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.search), title: Text("약국목록")),
+                icon: Icon(Icons.search), title: Text("내위치주변")),
             BottomNavigationBarItem(
                 icon: Icon(Icons.list), title: Text("검색기록")),
             BottomNavigationBarItem(

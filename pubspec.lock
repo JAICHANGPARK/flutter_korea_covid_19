@@ -310,6 +310,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  kopo:
+    dependency: "direct main"
+    description:
+      name: kopo
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   location:
     dependency: "direct main"
     description:
