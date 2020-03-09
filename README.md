@@ -1,6 +1,6 @@
-# fluttermasktest
+# [마스크5부제 대응] 공적마스크 검색이
 
-A new Flutter application.
+https://play.google.com/store/apps/details?id=flutter.dreamwalker.com.fluttermasktest
 
 ## Getting Started
 
