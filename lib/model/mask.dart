@@ -38,19 +38,23 @@ class Stores {
   String stockT;
   String type;
 
-  Stores(
-      {this.addr,
-        this.code,
-        this.createdAt,
-        this.lat,
-        this.lng,
-        this.name,
-        this.remainCnt,
-        this.soldCnt,
-        this.soldOut,
-        this.stockCnt,
-        this.stockT,
-        this.type});
+  String remainStat;
+
+  Stores({
+    this.addr,
+    this.code,
+    this.createdAt,
+    this.lat,
+    this.lng,
+    this.name,
+    this.remainCnt,
+    this.soldCnt,
+    this.soldOut,
+    this.stockCnt,
+    this.stockT,
+    this.type,
+    this.remainStat,
+  });
 
   Stores.fromJson(Map<String, dynamic> json) {
     addr = json['addr'];
@@ -65,6 +69,7 @@ class Stores {
     stockCnt = json['stock_cnt'];
     stockT = json['stock_t'];
     type = json['type'];
+    remainStat = json['remain_stat'];
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +86,7 @@ class Stores {
     data['stock_cnt'] = this.stockCnt;
     data['stock_t'] = this.stockT;
     data['type'] = this.type;
+    data['remain_stat'] = remainStat;
     return data;
   }
 }

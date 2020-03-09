@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:kopo/kopo.dart';
 import 'package:location/location.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
@@ -57,9 +58,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String userDay = "";
   String userBirth = "";
   String defaultRange = "100";
+
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
-  TextEditingController rangeTextController = TextEditingController();
+  TextEditingController rangeTextController =
+      TextEditingController(text: "100");
   TextEditingController birthTextController = TextEditingController();
 
   Location location = new Location();
@@ -237,7 +240,12 @@ class _MyHomePageState extends State<MyHomePage> {
             getSearchLog().then((r) {
               latTextController.text = r.lat;
               lngTextController.text = r.lng;
-              rangeTextController.text = r.range;
+              if (r.range == "") {
+                defaultRange = r.range;
+                rangeTextController.text = "100";
+              } else {
+                rangeTextController.text = r.range;
+              }
             });
           } else {
             setState(() {
@@ -335,7 +343,12 @@ class _MyHomePageState extends State<MyHomePage> {
               getSearchLog().then((r) {
                 latTextController.text = r.lat;
                 lngTextController.text = r.lng;
-                rangeTextController.text = r.range;
+                if (r.range == "") {
+                  defaultRange = r.range;
+                  rangeTextController.text = "100";
+                } else {
+                  rangeTextController.text = r.range;
+                }
               });
             } else {
               setState(() {
@@ -352,6 +365,8 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     });
   }
+
+  String addressJSON = '';
 
   @override
   Widget build(BuildContext context) {
@@ -393,12 +408,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => InformationWebViewPage(
-                        url:
-                        "http://blog.naver.com/kfdazzang/221837044802",
-                        title: "[카드뉴스] 마스크 사용 권고사항",
-                      )));
+                            url: "http://blog.naver.com/kfdazzang/221837044802",
+                            title: "[카드뉴스] 마스크 사용 권고사항",
+                          )));
                 }),
-
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("설정"),
@@ -448,10 +461,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text('앱정보'),
               onTap: () {
-                showAboutDialog(context: context,
+                showAboutDialog(
+                    context: context,
                     applicationName: "공적마스크 검색이",
                     applicationVersion: "1.1.1",
-                    applicationIcon: Image.asset('assets/icon/icons2/playstore.png', width: 64, height: 64,));
+                    applicationIcon: Image.asset(
+                      'assets/icon/icons2/playstore.png',
+                      width: 64,
+                      height: 64,
+                    ));
               },
             ),
             ListTile(
@@ -484,20 +502,22 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(
         index: pageIndex,
         children: <Widget>[
-         !appPublishFlag ? NotificationItem(): SingleChildScrollView(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "검색정보 입력",
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
+          !appPublishFlag
+              ? NotificationItem()
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    children: <Widget>[
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "검색정보 입력",
+                                style: Theme.of(context).textTheme.headline5,
+                              ),
 //                        Expanded(
 //                          child: Row(
 //                            children: <Widget>[
@@ -532,309 +552,216 @@ class _MyHomePageState extends State<MyHomePage> {
 //                            ],
 //                          ),
 //                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(flex: 2, child: Text('검색 반경')),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Expanded(
-                              flex: 8,
-                              child: TextField(
-                                autofocus: false,
-                                inputFormatters: [
-                                  WhitelistingTextInputFormatter.digitsOnly
-                                ],
-                                keyboardType: TextInputType.number,
-                                controller: rangeTextController,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: "반경(m)",
-                                    hintText: "10m(최대 10000m)"),
-                                onChanged: (value) {
-                                  if (int.parse(value) > 10000) {
-                                    rangeTextController.text = "10000";
-                                  }
-                                },
+                              SizedBox(
+                                height: 16,
                               ),
-                            )
-                          ],
-                        ),
-                        ButtonBar(
-                          children: <Widget>[
-                            MaterialButton(
-                              child: Text('검색'),
-                              onPressed: () {
-                                FocusScope.of(context).unfocus();
+                              Row(
+                                children: <Widget>[
+                                  Expanded(flex: 2, child: Text('검색 반경')),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Expanded(
+                                    flex: 8,
+                                    child: TextField(
+                                      autofocus: false,
+                                      inputFormatters: [
+                                        WhitelistingTextInputFormatter
+                                            .digitsOnly
+                                      ],
+                                      keyboardType: TextInputType.number,
+                                      controller: rangeTextController,
+                                      decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "반경(m)",
+                                          hintText: "10m(최대 10000m)"),
+                                      onChanged: (value) {
+                                        if (int.parse(value) > 10000) {
+                                          rangeTextController.text = "10000";
+                                        }
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                              ButtonBar(
+                                children: <Widget>[
+                                  MaterialButton(
+                                    child: Text('검색'),
+                                    onPressed: () {
+                                      FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
-                                String r = rangeTextController.text;
+                                      String r = rangeTextController.text;
 
-                                if (
+                                      if (
 //                              lat.length > 0 &&
 //                                  lng.length > 0 &&
-                                    _locationData != null && r.length > 0) {
-                                  print(
-                                      "latitude : ${_locationData.latitude.toString()}");
-                                  print(
-                                      "longitude : ${_locationData.longitude.toString()}");
-//                                  if (stores.length > 0 && stores != null) {
-//                                    stores.clear();
-//                                    getMask(_locationData.latitude.toString(), _locationData.longitude.toString(), r);
-//                                  }
-                                  setSearchLog(
-                                      _locationData.latitude.toString(),
-                                      _locationData.longitude.toString(),
-                                      r);
-                                } else {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                            content: Text("모든 조건을 입력해주세요"),
-                                          ));
-                                }
-                              },
-                              color: Colors.teal,
-                            )
-                          ],
-                        )
-                      ],
-                    ),
+                                          _locationData != null &&
+                                              r.length > 0) {
+                                        print(
+                                            "latitude : ${_locationData.latitude.toString()}");
+                                        print(
+                                            "longitude : ${_locationData.longitude.toString()}");
+                                        if (stores.length > 0 &&
+                                            stores != null) {
+                                          stores.clear();
+                                          getMask(
+                                              _locationData.latitude.toString(),
+                                              _locationData.longitude
+                                                  .toString(),
+                                              r);
+                                        }
+                                        setSearchLog(
+                                            _locationData.latitude.toString(),
+                                            _locationData.longitude.toString(),
+                                            r);
+                                      } else {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                                  content:
+                                                      Text("모든 조건을 입력해주세요"),
+                                                ));
+                                      }
+                                    },
+                                    color: Colors.teal,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height / 2.6,
+                        width: MediaQuery.of(context).size.width,
+                        child: FutureBuilder<Mask>(
+                          future: getMask(latTextController.text,
+                              lngTextController.text, rangeTextController.text),
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null)
+                              return Center(
+                                child: Text("다시 시도해주세요 "),
+                              );
+                            if (snapshot.hasData) {
+                              resultList = snapshot.data;
+                              stores = resultList.stores;
+                              return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: stores.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      color: stores[index].soldOut
+                                          ? Colors.grey
+                                          : Colors.white,
+                                      child: Container(
+                                        margin: EdgeInsets.only(bottom: 16),
+                                        padding: EdgeInsets.only(
+                                            left: 16, top: 16, bottom: 8),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                                "약국 이름: ${stores[index].name.substring(6)}"),
+                                            Text(
+                                              "주소 : ${stores[index].addr}",
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                            Text(
+                                                "판매 수량 : ${stores[index].soldCnt.toString()}개"),
+                                            stores[index].soldOut
+                                                ? Text("재고여부 : 매진")
+                                                : Text("재고여부 : 재고있음(확인필요)"),
+                                            Text(
+                                                "재고수량: ${stores[index].stockCnt.toString()}개")
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  });
+                            } else {
+                              return Center(
+                                  child: Column(
+                                children: <Widget>[
+                                  CircularProgressIndicator(),
+                                  Text("정보요청중...")
+                                ],
+                              ));
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  height: MediaQuery.of(context).size.height / 2.6,
-                  width: MediaQuery.of(context).size.width,
-                  child: FutureBuilder<Mask>(
-                    future: getMask(latTextController.text,
-                        lngTextController.text, rangeTextController.text),
-                    builder: (context, snapshot) {
-                      if (snapshot.data == null)
-                        return Center(
-                          child: Text("다시 시도해주세요 "),
-                        );
-                      if (snapshot.hasData) {
-                        resultList = snapshot.data;
-                        stores = resultList.stores;
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: stores.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                color: stores[index].soldOut
-                                    ? Colors.grey
-                                    : Colors.white,
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 16),
-                                  padding: EdgeInsets.only(
-                                      left: 16, top: 16, bottom: 8),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                          "약국 이름: ${stores[index].name.substring(6)}"),
-                                      Text(
-                                        "주소 : ${stores[index].addr}",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      Text(
-                                          "판매 수량 : ${stores[index].soldCnt.toString()}개"),
-                                      stores[index].soldOut
-                                          ? Text("재고여부 : 매진")
-                                          : Text("재고여부 : 재고있음(확인필요)"),
-                                      Text(
-                                          "재고수량: ${stores[index].stockCnt.toString()}개")
-                                    ],
-                                  ),
+          SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height - 140,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  "주소",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  addressJSON,
+                                  style: TextStyle(fontSize: 12),
+                                )
+                              ],
+                            ),
+                          ),
+                          MaterialButton(
+                            color: Colors.teal,
+                            onPressed: () async {
+                              KopoModel model = await Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => Kopo(),
                                 ),
                               );
-                            });
-                      } else {
-                        return Center(
-                            child: Column(
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            Text("정보요청중...")
-                          ],
-                        ));
-                      }
-                    },
+
+                              print("모델 두 제이썬 : ${model.toJson()}");
+                              setState(() {
+                                addressJSON =
+                                    '${model.address} ${model.buildingName}${model.apartment == 'Y' ? '아파트' : ''} ${model.zonecode} ';
+                              });
+
+                              print(addressJSON);
+                            },
+                            child: Text(
+                              "주소검색",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    flex: 10,
+                    child: Placeholder(),
+                  ),
+                ],
+              ),
             ),
           ),
-
-//          !appPublishFlag
-//              ? NotificationItem()
-//              : SingleChildScrollView(
-//                  padding: EdgeInsets.all(8),
-//                  child: Column(
-//                    children: <Widget>[
-//                      Card(
-//                        child: Container(
-//                          height: MediaQuery.of(context).size.height / 2.5,
-//                          padding: EdgeInsets.only(top: 16, left: 16),
-//                          child: Column(
-//                            crossAxisAlignment: CrossAxisAlignment.start,
-//                            children: <Widget>[
-//                              Text("검색정보 입력"),
-//                              Expanded(
-//                                child: Row(
-//                                  children: <Widget>[
-//                                    Expanded(flex: 2, child: Text('위도')),
-//                                    Expanded(
-//                                      flex: 8,
-//                                      child: TextField(
-//                                        keyboardType: TextInputType.number,
-//                                        controller: latTextController,
-//                                        decoration: InputDecoration(
-//                                            labelText: "위도",
-//                                            hintText: "37.xxx"),
-//                                      ),
-//                                    )
-//                                  ],
-//                                ),
-//                              ),
-//                              Expanded(
-//                                child: Row(
-//                                  children: <Widget>[
-//                                    Expanded(flex: 2, child: Text('경도')),
-//                                    Expanded(
-//                                      flex: 8,
-//                                      child: TextField(
-//                                        keyboardType: TextInputType.number,
-//                                        controller: lngTextController,
-//                                        decoration: InputDecoration(
-//                                            labelText: "경도",
-//                                            hintText: "127.xxx"),
-//                                      ),
-//                                    )
-//                                  ],
-//                                ),
-//                              ),
-//                              Expanded(
-//                                child: Row(
-//                                  children: <Widget>[
-//                                    Expanded(flex: 2, child: Text('검색 반경')),
-//                                    Expanded(
-//                                      flex: 8,
-//                                      child: TextField(
-//                                        keyboardType: TextInputType.number,
-//                                        controller: rangeTextController,
-//                                        decoration: InputDecoration(
-//                                            labelText: "반경(m)",
-//                                            hintText: "10m"),
-//                                      ),
-//                                    )
-//                                  ],
-//                                ),
-//                              ),
-//                              ButtonBar(
-//                                children: <Widget>[
-//                                  MaterialButton(
-//                                    child: Text('검색'),
-//                                    onPressed: () {
-//                                      String lat = latTextController.text;
-//                                      String lng = lngTextController.text;
-//                                      String r = rangeTextController.text;
-//
-//                                      if (lat.length > 0 &&
-//                                          lng.length > 0 &&
-//                                          r.length > 0) {
-//                                        if (stores.length > 0) {
-//                                          stores.clear();
-//                                          getMask(lat, lng, r);
-//                                        }
-//                                        setSearchLog(lat, lng, r);
-//                                      } else {
-//                                        showDialog(
-//                                            context: context,
-//                                            builder: (context) => AlertDialog(
-//                                                  content:
-//                                                      Text("모든 조건을 입력해주세요"),
-//                                                ));
-//                                      }
-//                                    },
-//                                    color: Colors.teal,
-//                                  )
-//                                ],
-//                              )
-//                            ],
-//                          ),
-//                        ),
-//                      ),
-//                      Container(
-//                        height: MediaQuery.of(context).size.height / 2.6,
-//                        width: MediaQuery.of(context).size.width,
-//                        child: FutureBuilder<Mask>(
-//                          future: getMask(latTextController.text,
-//                              lngTextController.text, rangeTextController.text),
-//                          builder: (context, snapshot) {
-//                            if (snapshot.data == null)
-//                              return Center(
-//                                child: Text("다시 시도해주세요 "),
-//                              );
-//                            if (snapshot.hasData) {
-//                              resultList = snapshot.data;
-//                              stores = resultList.stores;
-//                              return ListView.builder(
-//                                  shrinkWrap: true,
-//                                  itemCount: stores.length,
-//                                  itemBuilder: (context, index) {
-//                                    return Card(
-//                                      color: stores[index].soldOut
-//                                          ? Colors.grey
-//                                          : Colors.white,
-//                                      child: Container(
-//                                        margin: EdgeInsets.only(bottom: 16),
-//                                        padding: EdgeInsets.only(
-//                                            left: 16, top: 16, bottom: 8),
-//                                        child: Column(
-//                                          mainAxisAlignment:
-//                                              MainAxisAlignment.spaceBetween,
-//                                          crossAxisAlignment:
-//                                              CrossAxisAlignment.start,
-//                                          children: <Widget>[
-//                                            Text(
-//                                                "약국 이름: ${stores[index].name.substring(6)}"),
-//                                            Text(
-//                                              "주소 : ${stores[index].addr}",
-//                                              style: TextStyle(fontSize: 12),
-//                                            ),
-//                                            Text(
-//                                                "판매 수량 : ${stores[index].soldCnt.toString()}개"),
-//                                            stores[index].soldOut
-//                                                ? Text("재고여부 : 매진")
-//                                                : Text("재고여부 : 재고있음(확인필요)"),
-//                                            Text(
-//                                                "재고수량: ${stores[index].stockCnt.toString()}개")
-//                                          ],
-//                                        ),
-//                                      ),
-//                                    );
-//                                  });
-//                            } else {
-//                              return Center(
-//                                  child: Column(
-//                                children: <Widget>[
-//                                  CircularProgressIndicator(),
-//                                  Text("정보요청중...")
-//                                ],
-//                              ));
-//                            }
-//                          },
-//                        ),
-//                      ),
-//                    ],
-//                  ),
-//                ),
           Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
@@ -854,131 +781,154 @@ class _MyHomePageState extends State<MyHomePage> {
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "태어난 연도",
-                    style: GoogleFonts.roboto(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Card(
-                    elevation: 4,
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      width: MediaQuery.of(context).size.width,
+              child: Container(
+                height: MediaQuery.of(context).size.height - 80,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            "출생연도를 입력해주세요",
-                            style: TextStyle(
-                              fontSize: 18,
+                            "태어난 연도",
+                            style: GoogleFonts.roboto(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(
-                            height: 16,
+                          Card(
+                            elevation: 4,
+                            child: Container(
+                              padding: EdgeInsets.all(16),
+                              width: MediaQuery.of(context).size.width,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    "출생연도를 입력해주세요",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  TextField(
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(fontSize: 24),
+                                    autofocus: false,
+                                    maxLength: 4,
+                                    controller: birthTextController,
+                                    inputFormatters: [
+                                      WhitelistingTextInputFormatter.digitsOnly
+                                    ],
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "출생연도 4자리",
+                                        hintText: "19xx",
+                                        suffix: Text("년")),
+                                  ),
+                                  ButtonBar(
+                                    children: <Widget>[
+                                      MaterialButton(
+                                        color: Colors.teal,
+                                        onPressed: () {
+                                          if (birthTextController.text.length >
+                                                  0 &&
+                                              birthTextController.text.length ==
+                                                  4) {
+                                            FocusScope.of(context).unfocus();
+
+                                            int num = int.parse(
+                                                birthTextController.text[3]);
+
+                                            if (num == 1 || num == 6) {
+                                              userDay = "월";
+                                            } else if (num == 2 || num == 7) {
+                                              userDay = "화";
+                                            } else if (num == 3 || num == 8) {
+                                              userDay = "수";
+                                            } else if (num == 4 || num == 9) {
+                                              userDay = "목";
+                                            } else if (num == 5 || num == 0) {
+                                              userDay = "금";
+                                            }
+
+                                            setUserBirth(
+                                                birthTextController.text,
+                                                userDay);
+
+                                            setState(() {});
+                                          } else {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                      content: Text(
+                                                          "4자리 출생연도를 입력해주세요"),
+                                                    ));
+                                          }
+                                        },
+                                        child: Text('적용'),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
                           ),
-                          TextField(
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 24),
-                            autofocus: false,
-                            maxLength: 4,
-                            controller: birthTextController,
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly
-                            ],
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "출생연도 4자리",
-                                hintText: "19xx",
-                                suffix: Text("년")),
-                          ),
-                          ButtonBar(
-                            children: <Widget>[
-                              MaterialButton(
-                                color: Colors.teal,
-                                onPressed: () {
-                                  if (birthTextController.text.length > 0 &&
-                                      birthTextController.text.length == 4) {
-                                    FocusScope.of(context).unfocus();
-
-                                    int num =
-                                        int.parse(birthTextController.text[3]);
-
-                                    if (num == 1 || num == 6) {
-                                      userDay = "월";
-                                    } else if (num == 2 || num == 7) {
-                                      userDay = "화";
-                                    } else if (num == 3 || num == 8) {
-                                      userDay = "수";
-                                    } else if (num == 4 || num == 9) {
-                                      userDay = "목";
-                                    } else if (num == 5 || num == 0) {
-                                      userDay = "금";
-                                    }
-
-                                    setUserBirth(
-                                        birthTextController.text, userDay);
-
-                                    setState(() {});
-                                  } else {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                              content: Text("4자리 출생연도를 입력해주세요"),
-                                            ));
-                                  }
-                                },
-                                child: Text('적용'),
-                              )
-                            ],
-                          )
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Text(
-                    "구매가능요일",
-                    style: GoogleFonts.roboto(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "평일에 구매하지 못하였다면 주말(토,일)에 구매가능합니다.",
-                    style: GoogleFonts.roboto(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Card(
-                    elevation: 4,
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      child: Center(
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "매주",
-                              style: GoogleFonts.roboto(fontSize: 48),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "구매가능요일",
+                            style: GoogleFonts.roboto(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
-                            Text(
-                              userDay,
-                              style: GoogleFonts.roboto(fontSize: 84),
+                          ),
+                          Text(
+                            "평일에 구매하지 못하였다면 주말(토,일)에 구매가능합니다.",
+                            style: GoogleFonts.roboto(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
                             ),
-                          ],
-                        ),
+                          ),
+                          Card(
+                            elevation: 4,
+                            child: Container(
+                              padding: EdgeInsets.all(16),
+                              child: Center(
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      "매주",
+                                      style: GoogleFonts.roboto(fontSize: 48),
+                                    ),
+                                    Text(
+                                      userDay,
+                                      style: GoogleFonts.roboto(fontSize: 84),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           )
@@ -1001,9 +951,12 @@ class _MyHomePageState extends State<MyHomePage> {
               pageIndex = newValue;
             });
           },
+          type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.search), title: Text("내위치주변")),
+                icon: Icon(Icons.location_searching), title: Text("내위치주변")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.location_city), title: Text("주소기반검색")),
             BottomNavigationBarItem(
                 icon: Icon(Icons.list), title: Text("검색기록")),
             BottomNavigationBarItem(
