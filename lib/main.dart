@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:fluttermasktest/model/search.dart';
 import 'package:fluttermasktest/model/store_sale_result.dart';
 import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
+import 'package:fluttermasktest/ui/screen/search_addr_page.dart';
 import 'package:fluttermasktest/utils/app_string.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -29,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 void main() async {
   runApp(MyApp());
@@ -100,6 +104,25 @@ class _MyHomePageState extends State<MyHomePage> {
       return m;
     } else {
       return null;
+    }
+  }
+
+  Future<void> getUserAddress(String lat, String lng) async {
+    var url =
+        'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${lng},${lat}&output=json';
+    var response = await http.get(
+      url,
+      headers: {
+        'X-NCP-APIGW-API-KEY-ID': '5wusqxusb3',
+        'X-NCP-APIGW-API-KEY': '60YESq180I6pAqJiJAc9W04EjQMS9PfEBjBe3ikN',
+      },
+    );
+    print('Response status: ${response.statusCode}');
+    if (response.statusCode == HttpStatus.ok) {
+      print('Response body: ${response.body}');
+      return true;
+    } else if (response.statusCode == HttpStatus.notFound) {
+      return false;
     }
   }
 
@@ -242,9 +265,44 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void firebaseCloudMessagingListeners() {
+    _firebaseMessaging.getToken().then((token) {
+      print('token:' + token);
+    });
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('on message $message');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("실시간 공지사항"),
+            content: ListTile(
+              title: Text(message["notification"]["title"]),
+              subtitle: Text(message["notification"]["body"]),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("OK"),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            ],
+          ),
+        );
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('on resume $message');
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('on launch $message');
+      },
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    firebaseCloudMessagingListeners();
 
     getUserServiceAgree().then((v) async {
       userServiceAgree = v;
@@ -280,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
               print("저장된 거리값 : ${r.range}");
               if (r.range == "") {
                 defaultRange = r.range;
-                rangeTextController.text = "100";
+                rangeTextController.text = "1000";
               } else {
                 rangeTextController.text = r.range;
               }
@@ -653,7 +711,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: Theme.of(context).textTheme.headline5,
                         ),
                         Text(
-                          "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 100m)",
+                          "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 1000 [m] / 1 [km])",
                           style: Theme.of(context).textTheme.caption,
                         ),
                         Padding(
@@ -900,23 +958,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
                                         if (remain == "plenty") {
                                           stockColor = Colors.lightGreen;
-                                          stockText = "100개 이상";
+                                          stockText = "100개 이상😆";
                                           stockTextColor = Colors.white;
                                         } else if (remain == "some") {
                                           stockColor = Colors.yellow;
-                                          stockText = "30개이상~\n100개미만";
+                                          stockText = "30개이상~\n100개미만😀";
                                           stockTextColor = Colors.black;
                                         } else if (remain == "few") {
                                           stockColor = Colors.red;
-                                          stockText = "30개 미만";
+                                          stockText = "30개 미만🤔";
                                           stockTextColor = Colors.white;
                                         } else if (remain == "empty") {
                                           stockColor = Colors.grey;
-                                          stockText = "재고없음";
+                                          stockText = "재고없음😢";
                                           stockTextColor = Colors.white;
                                         } else {
                                           stockColor = Colors.grey;
-                                          stockText = "등록된 정보없음";
+                                          stockText = "정보없음😢";
                                           stockTextColor = Colors.white;
                                         }
 
@@ -927,7 +985,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(38),
-                                                bottomRight: Radius.circular(38),
+                                                bottomRight:
+                                                    Radius.circular(38),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
@@ -938,7 +997,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     offset: Offset(2, 2))
                                               ]),
                                           child: Padding(
-                                            padding: const EdgeInsets.all(12),
+                                            padding: const EdgeInsets.all(16),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -986,7 +1045,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           ]),
                                                       child: Center(
                                                           child: Text(
-                                                            typeText,
+                                                        typeText,
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight
@@ -1094,11 +1153,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                       8),
                                                           decoration:
                                                               BoxDecoration(
-
-                                                                borderRadius: BorderRadius.only(
-                                                                  bottomRight: Radius.circular(24),
-                                                                  topLeft: Radius.circular(24),
-                                                                ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .only(
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            24),
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            24),
+                                                                  ),
                                                                   color:
                                                                       stockColor),
                                                           child: Center(
@@ -1182,7 +1246,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          //두번째 페이지
+//          SearchAddressPage(),
+          // 두번째 페이지
           Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
@@ -1194,13 +1259,59 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Image.network(
-                      "https://assets-ouch.icons8.com/thumb/628/9e2ae09a-5ef3-4b07-bcf1-6396638057d2.png"),
-                  SizedBox(
-                    height: 24,
+                    "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
+                    height: MediaQuery.of(context).size.height / 3,
+                    width: MediaQuery.of(context).size.width / 2,
                   ),
-                  Center(
-                    child: Text("개발중...업데이트 예정"),
+                  AvatarGlow(
+                    startDelay: Duration(milliseconds: 1000),
+                    glowColor: Colors.blue,
+                    endRadius: 120.0,
+                    duration: Duration(milliseconds: 2000),
+                    repeat: true,
+                    showTwoGlows: true,
+                    repeatPauseDuration: Duration(milliseconds: 100),
+                    child: Material(
+                      elevation: 8.0,
+                      shape: CircleBorder(),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[100],
+                        child: Image.asset(
+                          'assets/images/flutter.png',
+                          height: 60,
+                        ),
+                        radius: 60.0,
+                      ),
+                    ),
+                    shape: BoxShape.circle,
+                    animate: true,
+                    curve: Curves.fastOutSlowIn,
                   ),
+                  MaterialButton(
+                    child: Text("원클릭 검색하기"),
+                    onPressed: () async {
+                      _permissionGranted = await location.hasPermission();
+                      if (_permissionGranted == PermissionStatus.DENIED) {
+                        print("원래 권한이 디나인");
+                        _permissionGranted = await location.requestPermission();
+                        if (_permissionGranted != PermissionStatus.GRANTED) {
+                          print("요청하고 위치 권한 허용 안함");
+                        } else {
+                          print("요청하고 위치권한 허용함.");
+                        }
+                      } else {
+                        print("위치 권한 허용 유저");
+                        if (_locationData != null) {
+                          print(_locationData.latitude.toString());
+                          getUserAddress(_locationData.latitude.toString(),
+                              _locationData.longitude.toString());
+                        }else{
+                          _locationData = await location.getLocation();
+                        }
+                      }
+//
+                    },
+                  )
                 ],
               ),
             ),
@@ -1552,5 +1663,56 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       throw 'Could not launch';
     }
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // TODO: implement buildActions
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // TODO: implement buildLeading
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // TODO: implement buildResults
+
+    if (query.length < 3) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Center(
+            child: Text(
+              "Search term must be longer than two letters.",
+            ),
+          )
+        ],
+      );
+    }
+    return Column();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // TODO: implement buildSuggestions
+    return Column();
   }
 }
