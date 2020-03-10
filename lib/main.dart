@@ -9,30 +9,37 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttermasktest/model/naver_reversegeocode.dart' as ng;
 
 import 'package:fluttermasktest/model/recent.dart';
-import 'package:fluttermasktest/model/search.dart';
+
 import 'package:fluttermasktest/model/store_sale_result.dart';
-import 'package:fluttermasktest/ui/common/notification_item.dart';
+
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
-import 'package:fluttermasktest/ui/screen/search_addr_page.dart';
+
 import 'package:fluttermasktest/utils/app_string.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:hive/hive.dart';
+
 
 import 'package:http/http.dart' as http;
-import 'package:kopo/kopo.dart';
+
 import 'package:line_icons/line_icons.dart';
 import 'package:location/location.dart';
 import 'package:package_info/package_info.dart';
 import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
 final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+enum OnClickProcessState {
+  beforeStart,
+  start,
+  success,
+  failed,
+}
 
 void main() async {
   runApp(MyApp());
@@ -92,6 +99,11 @@ class _MyHomePageState extends State<MyHomePage> {
   bool userServiceAgree = false;
   String version;
 
+  OnClickProcessState onClickProcessState = OnClickProcessState.beforeStart;
+  bool onClickStart = false;
+  String onClickStateText = "";
+
+
   Future<StoreSaleResult> getMask(String lat, String lng, String range) async {
     var url =
         'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
@@ -107,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> getUserAddress(String lat, String lng) async {
+  Future<String> getUserAddress(String lat, String lng) async {
     var url =
         'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${lng},${lat}&output=json';
     var response = await http.get(
@@ -120,9 +132,33 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Response status: ${response.statusCode}');
     if (response.statusCode == HttpStatus.ok) {
       print('Response body: ${response.body}');
-      return true;
+      ng.NaverGeo naverGeo = ng.NaverGeo.fromJson(json.decode(response.body));
+
+      List<ng.Results> tmpResult = naverGeo.results;
+      if (tmpResult.length > 0) {
+        String userAddress =
+           "${tmpResult[0].region.area1.name} ${tmpResult[0].region.area2.name} ${tmpResult[0].region.area3.name}" ;
+        print(userAddress);
+        return userAddress;
+      }else{
+        return "";
+      }
     } else if (response.statusCode == HttpStatus.notFound) {
-      return false;
+      return "404";
+    }
+  }
+
+  Future<StoreSaleResult> getMaskFromAddress(String address) async {
+    var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address=$address';
+    var response = await http.get(url);
+    print('Response status: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      print('Response body: ${response.body}');
+      StoreSaleResult m = StoreSaleResult.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
+      return m;
+    } else {
+      return null;
     }
   }
 
@@ -1254,66 +1290,120 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.network(
-                    "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
-                    height: MediaQuery.of(context).size.height / 3,
-                    width: MediaQuery.of(context).size.width / 2,
-                  ),
-                  AvatarGlow(
-                    startDelay: Duration(milliseconds: 1000),
-                    glowColor: Colors.blue,
-                    endRadius: 120.0,
-                    duration: Duration(milliseconds: 2000),
-                    repeat: true,
-                    showTwoGlows: true,
-                    repeatPauseDuration: Duration(milliseconds: 100),
-                    child: Material(
-                      elevation: 8.0,
-                      shape: CircleBorder(),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.grey[100],
-                        child: Image.asset(
-                          'assets/images/flutter.png',
-                          height: 60,
+              child: onClickStart
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CircularProgressIndicator(),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(onClickStateText),
+                        )
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.network(
+                          "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
+                          height: MediaQuery.of(context).size.height / 3,
+                          width: MediaQuery.of(context).size.width / 2,
                         ),
-                        radius: 60.0,
-                      ),
+                        GestureDetector(
+                          onTap: () async {
+                            _permissionGranted = await location.hasPermission();
+                            if (_permissionGranted == PermissionStatus.DENIED) {
+                              print("원래 권한이 디나인");
+                              _permissionGranted =
+                                  await location.requestPermission();
+                              if (_permissionGranted !=
+                                  PermissionStatus.GRANTED) {
+                                print("요청하고 위치 권한 허용 안함");
+                              } else {
+                                print("요청하고 위치권한 허용함.");
+                              }
+                            } else {
+                              print("위치 권한 허용 유저");
+                              if (_locationData != null) {
+                                print(_locationData.latitude.toString());
+                                setState(() {
+                                  onClickStart = true;
+                                  onClickStateText = "주소 정보 가져오는 중...";
+                                });
+                                getUserAddress(
+                                    _locationData.latitude.toString(),
+                                    _locationData.longitude.toString()).then((value){
+
+                                      print(value);
+                                      if(value != "" && value != "404"){
+                                        setState(() {
+                                          onClickStateText = "주소 정보 가져오기 성공!! 😍\n"
+                                              "$value 주변의 공적마스크 판매처를 검색중입니다..."
+                                              "잠시만 기다려주세요";
+                                        });
+                                        getMaskFromAddress(value).then((result){
+                                          if(result != null){
+
+                                            List<Stores> tmpStores = result.stores;
+                                            tmpStores.forEach((element) {
+                                              print(element.name);
+                                            });
+                                            setState(() {
+                                              onClickStart = true;
+                                              onClickStateText = "주변 ${result.count}곳의 장소를 찾았습니다.";
+                                            });
+                                          }
+                                        });
+//                                        setState(() {
+//                                          onClickStateText ="$value 주변의 공적마스크 판매처를 검색중입니다...";
+//                                        });
+                                      }
+
+                                }).whenComplete((){
+
+                                });
+                              } else {
+                                _locationData = await location.getLocation();
+                              }
+                            }
+                          },
+                          child: AvatarGlow(
+                            startDelay: Duration(milliseconds: 1000),
+                            glowColor: Colors.red,
+                            endRadius: 120.0,
+                            duration: Duration(milliseconds: 2000),
+                            repeat: true,
+                            showTwoGlows: true,
+                            repeatPauseDuration: Duration(milliseconds: 100),
+                            child: Material(
+                              elevation: 8.0,
+                              shape: CircleBorder(),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.grey[100],
+                                child: Icon(
+                                  LineIcons.play,
+                                  size: 58,
+                                  color: Colors.red,
+                                ),
+                                radius: 60.0,
+                              ),
+                            ),
+                            shape: BoxShape.circle,
+                            animate: true,
+                            curve: Curves.fastOutSlowIn,
+                          ),
+                        ),
+                        Text(
+                          "원클릭 검색하기",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline5
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    shape: BoxShape.circle,
-                    animate: true,
-                    curve: Curves.fastOutSlowIn,
-                  ),
-                  MaterialButton(
-                    child: Text("원클릭 검색하기"),
-                    onPressed: () async {
-                      _permissionGranted = await location.hasPermission();
-                      if (_permissionGranted == PermissionStatus.DENIED) {
-                        print("원래 권한이 디나인");
-                        _permissionGranted = await location.requestPermission();
-                        if (_permissionGranted != PermissionStatus.GRANTED) {
-                          print("요청하고 위치 권한 허용 안함");
-                        } else {
-                          print("요청하고 위치권한 허용함.");
-                        }
-                      } else {
-                        print("위치 권한 허용 유저");
-                        if (_locationData != null) {
-                          print(_locationData.latitude.toString());
-                          getUserAddress(_locationData.latitude.toString(),
-                              _locationData.longitude.toString());
-                        }else{
-                          _locationData = await location.getLocation();
-                        }
-                      }
-//
-                    },
-                  )
-                ],
-              ),
             ),
           ),
 
@@ -1612,6 +1702,88 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           : null, // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  _buildOnClickWidget(OnClickProcessState onClickProcessState) {
+    switch (onClickProcessState) {
+      case OnClickProcessState.beforeStart:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.network(
+              "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
+              height: MediaQuery.of(context).size.height / 3,
+              width: MediaQuery.of(context).size.width / 2,
+            ),
+            GestureDetector(
+              onTap: () async {
+                _permissionGranted = await location.hasPermission();
+                if (_permissionGranted == PermissionStatus.DENIED) {
+                  print("원래 권한이 디나인");
+                  _permissionGranted = await location.requestPermission();
+                  if (_permissionGranted != PermissionStatus.GRANTED) {
+                    print("요청하고 위치 권한 허용 안함");
+                  } else {
+                    print("요청하고 위치권한 허용함.");
+                  }
+                } else {
+                  print("위치 권한 허용 유저");
+                  if (_locationData != null) {
+                    print(_locationData.latitude.toString());
+                    setState(() {
+                      onClickProcessState = OnClickProcessState.start;
+                    });
+                    getUserAddress(_locationData.latitude.toString(),
+                        _locationData.longitude.toString());
+                  } else {
+                    _locationData = await location.getLocation();
+                  }
+                }
+              },
+              child: AvatarGlow(
+                startDelay: Duration(milliseconds: 1000),
+                glowColor: Colors.red,
+                endRadius: 120.0,
+                duration: Duration(milliseconds: 2000),
+                repeat: true,
+                showTwoGlows: true,
+                repeatPauseDuration: Duration(milliseconds: 100),
+                child: Material(
+                  elevation: 8.0,
+                  shape: CircleBorder(),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey[100],
+                    child: Icon(
+                      LineIcons.play,
+                      size: 58,
+                      color: Colors.red,
+                    ),
+                    radius: 60.0,
+                  ),
+                ),
+                shape: BoxShape.circle,
+                animate: true,
+                curve: Curves.fastOutSlowIn,
+              ),
+            ),
+            Text(
+              "원클릭 검색하기",
+              style: Theme.of(context)
+                  .textTheme
+                  .headline5
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
+        );
+        break;
+      case OnClickProcessState.start:
+        return Column();
+        break;
+      default:
+        return null;
+        break;
+    }
   }
 
   @override

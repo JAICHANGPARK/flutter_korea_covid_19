@@ -184,8 +184,8 @@ class Coords {
 
 class Center {
   String crs;
-  int x;
-  int y;
+  double x;
+  double y;
 
   Center({this.crs, this.x, this.y});
 
