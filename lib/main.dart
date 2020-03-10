@@ -77,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   StreamSubscription<LocationData> locationSubscription;
   String error;
   bool userServiceAgree = false;
+  String version;
 
   Future<Mask> getMask(String lat, String lng, String range) async {
     var url =
@@ -158,17 +159,18 @@ class _MyHomePageState extends State<MyHomePage> {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appName = packageInfo.appName;
     String packageName = packageInfo.packageName;
-    String version = packageInfo.version;
+    version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
     print("version : $version   buildNumber : $buildNumber");
-    if(tmp == buildNumber){
+    if (int.parse(tmp) == int.parse(buildNumber)) {
       return false;
-    }else{
+    } else if (int.parse(tmp) > int.parse(buildNumber)) {
       return true;
+    } else {
+      print("현재 버전이 더 높음");
+      return false;
     }
   }
-
-
 
   Future<void> checkLocationServiceEnable() async {
     _serviceEnabled = await location.serviceEnabled();
@@ -235,7 +237,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
 
-
     getUserServiceAgree().then((v) async {
       userServiceAgree = v;
       if (v) {
@@ -271,8 +272,8 @@ class _MyHomePageState extends State<MyHomePage> {
               } else {
                 rangeTextController.text = r.range;
               }
-              getAppVersion().then((b) async{
-                if(b){
+              getAppVersion().then((b) async {
+                if (b) {
                   _showVersionDialog(context);
 
 //                  await showDialog(context: context, builder: (context){
@@ -297,33 +298,13 @@ class _MyHomePageState extends State<MyHomePage> {
 //                    );
 //                  });
                 }
-
               });
             });
           } else {
-            getAppVersion().then((b) async{
-              if(b){
-//                await showDialog(context: context, builder: (context){
-//                  return AlertDialog(
-//                    actions: <Widget>[
-//                      ButtonBar(
-//                        children: <Widget>[
-//                          FlatButton(
-//                            onPressed: () {  },
-//                            child: Text("확인"),
-//                          ),
-//                          FlatButton(
-//                            onPressed: () {  },
-//                            child: Text("나중에"),
-//                          )
-//                        ],
-//                      )
-//                    ],
-//                  );
-//                });
+            getAppVersion().then((b) async {
+              if (b) {
                 _showVersionDialog(context);
               }
-
             });
             setState(() {
               appPublishFlag = false;
@@ -428,8 +409,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 } else {
                   rangeTextController.text = r.range;
                 }
+                getAppVersion().then((b) async {
+                  if (b) {
+                    _showVersionDialog(context);
+                  }
+                });
               });
             } else {
+              getAppVersion().then((b) async {
+                if (b) {
+                  _showVersionDialog(context);
+                }
+              });
               setState(() {
                 appPublishFlag = false;
               });
@@ -454,7 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             ListTile(
-              title: Text('마스크5부제 정보'),
+              title: Text('마스크5부제 관련 정보'),
               leading: Icon(Icons.info_outline),
             ),
             Divider(
@@ -462,13 +453,23 @@ class _MyHomePageState extends State<MyHomePage> {
               thickness: 1.2,
             ),
             ListTile(
-              title: Text('공적마스크 구매 안내'),
+              title: Text('공적 마스크 구매 안내'),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => InformationWebViewPage(
                           url:
                               "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
                           title: "공적마스크 구매 안내",
+                        )));
+              },
+            ),
+            ListTile(
+              title: Text('공적 마스크 구입 요령'),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => InformationWebViewPage(
+                          url: "http://blog.naver.com/kfdazzang/221844817502",
+                          title: "공적마스크 구입 요령",
                         )));
               },
             ),
@@ -489,6 +490,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (context) => InformationWebViewPage(
                             url: "http://blog.naver.com/kfdazzang/221837044802",
                             title: "[카드뉴스] 마스크 사용 권고사항",
+                          )));
+                }),
+            ListTile(
+                title: Text('공적마스크 관련 QnA'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => InformationWebViewPage(
+                            url: "https://www.mfds.go.kr/brd/m_659/list.do",
+                            title: "공적마스크 관련 QnA",
                           )));
                 }),
             ListTile(
@@ -525,14 +535,14 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 ListTile(
                   title: Text("개발"),
-                  subtitle: Text("박제창"),
+                  subtitle: Text("박제창 (Dreamwalker)"),
                 ),
                 ListTile(
-                  title: Text("이메일"),
+                  title: Text("이메일 (문의하기)"),
                   subtitle: Text("aristojeff@gmail.com"),
                 ),
                 ListTile(
-                  title: Text("레포지토리"),
+                  title: Text("리포지토리"),
                   subtitle: Text("https://github.com/JAICHANGPARK"),
                 ),
               ],
@@ -543,7 +553,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 showAboutDialog(
                     context: context,
                     applicationName: "공적마스크 검색이",
-                    applicationVersion: "1.1.1",
+                    applicationVersion: version,
                     applicationIcon: Image.asset(
                       'assets/icon/icons2/playstore.png',
                       width: 64,
@@ -559,7 +569,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
-              title: Text("서비스 이용 동의"),
+                title: Text("정보 제공"),
+                subtitle: Text(
+                  "공공데이터포털(건강보험심사평가원)",
+                  style: TextStyle(fontSize: 12),
+                )),
+            ListTile(
+              title: Text(
+                "서비스 이용 동의",
+              ),
               subtitle: userServiceAgree
                   ? Text(
                       "서비스 사용 동의 처리완료",
@@ -569,7 +587,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       "서비스 사용 동의 미완료",
                       style: TextStyle(fontSize: 12),
                     ),
-            )
+            ),
           ],
         ),
       ),
@@ -582,111 +600,116 @@ class _MyHomePageState extends State<MyHomePage> {
         index: pageIndex,
         children: <Widget>[
           !appPublishFlag
-              ? NotificationItem():
+              ? NotificationItem()
+              :
 
-          //첫번쨰 페이지
-          SingleChildScrollView(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  elevation: 6,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 16, bottom: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "검색 반경 설정",
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
-                        Text(
-                          "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 100m)",
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Row(
+              //첫번쨰 페이지
+              SingleChildScrollView(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    children: <Widget>[
+                      Card(
+                        elevation: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, right: 16, top: 16, bottom: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Expanded(
-                                flex: 8,
-                                child: TextField(
-                                  autofocus: false,
-                                  inputFormatters: [
-                                    WhitelistingTextInputFormatter.digitsOnly
-                                  ],
-                                  keyboardType: TextInputType.number,
-                                  controller: rangeTextController,
-                                  decoration: InputDecoration(
-                                      suffix: Text("m"),
-                                      border: OutlineInputBorder(),
-                                      labelText: "반경(m)",
-                                      hintText: "10m(최대 10000m)"),
-                                  onChanged: (value) {
-                                    if (int.parse(value) > 10000) {
-                                      rangeTextController.text = "10000";
-                                    }
-                                  },
-                                ),
+                              Text(
+                                "검색 반경 설정",
+                                style: Theme.of(context).textTheme.headline5,
                               ),
-                              Expanded(
-                                flex: 3,
-                                child: ButtonBar(
+                              Text(
+                                "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 100m)",
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Row(
                                   children: <Widget>[
-                                    MaterialButton(
-                                      child: Text('검색'),
-                                      onPressed: () {
-                                        FocusScope.of(context).unfocus();
+                                    Expanded(
+                                      flex: 8,
+                                      child: TextField(
+                                        autofocus: false,
+                                        inputFormatters: [
+                                          WhitelistingTextInputFormatter
+                                              .digitsOnly
+                                        ],
+                                        keyboardType: TextInputType.number,
+                                        controller: rangeTextController,
+                                        decoration: InputDecoration(
+                                            suffix: Text("m"),
+                                            border: OutlineInputBorder(),
+                                            labelText: "반경(m)",
+                                            hintText: "10m(최대 10000m)"),
+                                        onChanged: (value) {
+                                          if (int.parse(value) > 10000) {
+                                            rangeTextController.text = "10000";
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: ButtonBar(
+                                        children: <Widget>[
+                                          MaterialButton(
+                                            child: Text('검색'),
+                                            onPressed: () {
+                                              FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
-                                        String r = rangeTextController.text;
+                                              String r =
+                                                  rangeTextController.text;
 
-                                        if (
+                                              if (
 //                              lat.length > 0 &&
 //                                  lng.length > 0 &&
-                                            _locationData != null &&
-                                                r.length > 0) {
-                                          print(
-                                              "latitude : ${_locationData.latitude.toString()}");
-                                          print(
-                                              "longitude : ${_locationData.longitude.toString()}");
-                                          if (stores.length > 0 &&
-                                              stores != null) {
-                                            stores.clear();
-                                            getMask(
-                                                _locationData.latitude
-                                                    .toString(),
-                                                _locationData.longitude
-                                                    .toString(),
-                                                r);
-                                          }
-                                          setSearchLog(
-                                              _locationData.latitude.toString(),
-                                              _locationData.longitude
-                                                  .toString(),
-                                              r);
-                                        } else {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    content:
-                                                        Text("모든 조건을 입력해주세요"),
-                                                  ));
-                                        }
-                                      },
-                                      color: Colors.teal,
+                                                  _locationData != null &&
+                                                      r.length > 0) {
+                                                print(
+                                                    "latitude : ${_locationData.latitude.toString()}");
+                                                print(
+                                                    "longitude : ${_locationData.longitude.toString()}");
+                                                if (stores.length > 0 &&
+                                                    stores != null) {
+                                                  stores.clear();
+                                                  getMask(
+                                                      _locationData.latitude
+                                                          .toString(),
+                                                      _locationData.longitude
+                                                          .toString(),
+                                                      r);
+                                                }
+                                                setSearchLog(
+                                                    _locationData.latitude
+                                                        .toString(),
+                                                    _locationData.longitude
+                                                        .toString(),
+                                                    r);
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                          content: Text(
+                                                              "모든 조건을 입력해주세요"),
+                                                        ));
+                                              }
+                                            },
+                                            color: Colors.teal,
+                                          )
+                                        ],
+                                      ),
                                     )
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
 
 //                      Container(
 //                        margin: EdgeInsets.only(top: 16),
@@ -805,157 +828,172 @@ class _MyHomePageState extends State<MyHomePage> {
 //                        ),
 //
 
-                Container(
-                  height: MediaQuery.of(context).size.height / 1.8,
-                  width: MediaQuery.of(context).size.width,
-                  child: FutureBuilder<Mask>(
-                    future: getMask(latTextController.text,
-                        lngTextController.text, rangeTextController.text),
-                    builder: (context, snapshot) {
-                      if (snapshot.data == null)
-                        return Center(
-                          child: Text("다시 시도해주세요 "),
-                        );
-                      if (snapshot.hasData) {
-                        resultList = snapshot.data;
-                        stores = resultList.stores;
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: stores.length,
-                            itemBuilder: (context, index) {
-                              Color stockColor;
-                              String stockText = "알수없음";
-                              String remain = stores[index].remainStat;
-                              if (remain == "plenty") {
-                                stockColor = Colors.lightGreen;
-                                stockText = "100개 이상";
-                              } else if (remain == "some") {
-                                stockColor = Colors.yellow;
-                                stockText = "30개 이상 100개미만";
-                              } else if (remain == "few") {
-                                stockColor = Colors.red;
-                                stockText = "30개 미만";
-                              } else if (remain == "empty") {
-                                stockColor = Colors.grey;
-                                stockText = "재고없음";
-                              } else {
-                                stockText = "알수없음";
-                              }
+                      Container(
+                        height: MediaQuery.of(context).size.height / 1.8,
+                        width: MediaQuery.of(context).size.width,
+                        child: FutureBuilder<Mask>(
+                          future: getMask(latTextController.text,
+                              lngTextController.text, rangeTextController.text),
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null)
+                              return Center(
+                                child: Text("다시 시도해주세요 "),
+                              );
+                            if (snapshot.hasData) {
+                              resultList = snapshot.data;
+                              stores = resultList.stores;
+                              return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: stores.length,
+                                  itemBuilder: (context, index) {
+                                    Color stockColor;
+                                    String stockText = "알수없음";
+                                    String remain = stores[index].remainStat;
+                                    if (remain == "plenty") {
+                                      stockColor = Colors.lightGreen;
+                                      stockText = "100개 이상";
+                                    } else if (remain == "some") {
+                                      stockColor = Colors.yellow;
+                                      stockText = "30개이상 100개미만";
+                                    } else if (remain == "few") {
+                                      stockColor = Colors.red;
+                                      stockText = "30개 미만";
+                                    } else if (remain == "empty") {
+                                      stockColor = Colors.grey;
+                                      stockText = "재고없음";
+                                    } else {
+                                      stockText = "알수없음";
+                                    }
 
-                              return Container(
-                                margin: EdgeInsets.only(
-                                    bottom: 16, left: 8, right: 8),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(38),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          blurRadius: 2,
-                                          spreadRadius: 1,
-                                          offset: Offset(2, 2))
-                                    ]),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.all(12),
-                                            width: 120,
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(24),
-                                                  bottomRight:
-                                                      Radius.circular(24),
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.15),
-                                                      blurRadius: 3,
-                                                      spreadRadius: 2,
-                                                      offset: Offset(4, 4)),
-                                                  BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.05),
-                                                      blurRadius: 1,
-                                                      spreadRadius: 1,
-                                                      offset: Offset(-2, -2)),
-                                                ]),
-                                            child: Center(child: Text("약국")),
+                                    return Container(
+                                      margin: EdgeInsets.only(
+                                          bottom: 16, left: 8, right: 8),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(38),
                                           ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: <Widget>[
-                                              Text(
-                                                "입고시간: ${stores[index].stockT}",
-                                                style: TextStyle(fontSize: 12),
-                                              ),
-                                              Text(
-                                                "생성일: ${stores[index].createdAt}",
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 16,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Expanded(
-                                            flex: 6,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 2,
+                                                spreadRadius: 1,
+                                                offset: Offset(2, 2))
+                                          ]),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: <Widget>[
-                                                Text(
-                                                  "판매처: ${stores[index].name}",
-                                                  style:
-                                                      TextStyle(fontSize: 16),
+                                                Container(
+                                                  padding: EdgeInsets.all(12),
+                                                  width: 120,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(24),
+                                                        bottomRight:
+                                                            Radius.circular(24),
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.15),
+                                                            blurRadius: 3,
+                                                            spreadRadius: 2,
+                                                            offset:
+                                                                Offset(4, 4)),
+                                                        BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.05),
+                                                            blurRadius: 1,
+                                                            spreadRadius: 1,
+                                                            offset:
+                                                                Offset(-2, -2)),
+                                                      ]),
+                                                  child:
+                                                      Center(child: Text("약국")),
                                                 ),
-                                                Text(
-                                                  "${stores[index].addr}",
-                                                  style:
-                                                      TextStyle(fontSize: 12),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "입고시간: ${stores[index].stockT}",
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    ),
+                                                    Text(
+                                                      "생성일: ${stores[index].createdAt}",
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    )
+                                                  ],
                                                 )
                                               ],
                                             ),
-                                          ),
-                                          Expanded(
-                                              flex: 3,
-                                              child: Container(
-                                                height: 38,
-                                                width: 38,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.lightGreen),
-                                                child: Center(
-                                                  child: Text(
-                                                    stockText,
-                                                    style: TextStyle(
-                                                        color: stockColor),
+                                            SizedBox(
+                                              height: 16,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        "판매처: ${stores[index].name}",
+                                                        style: TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                      Text(
+                                                        "${stores[index].addr}",
+                                                        style: TextStyle(
+                                                            fontSize: 12),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                              )),
-                                        ],
+                                                Expanded(
+                                                    flex: 3,
+                                                    child: Container(
+                                                      height: 38,
+                                                      width: 38,
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .lightGreen),
+                                                      child: Center(
+                                                        child: Text(
+                                                          stockText,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  stockColor),
+                                                        ),
+                                                      ),
+                                                    )),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                                    );
 
 //                                    return Card(
 //                                      color: stores[index].soldOut
@@ -989,23 +1027,22 @@ class _MyHomePageState extends State<MyHomePage> {
 //                                        ),
 //                                      ),
 //                                    );
-                            });
-                      } else {
-                        return Center(
-                            child: Column(
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            Text("정보요청중...")
-                          ],
-                        ));
-                      }
-                    },
+                                  });
+                            } else {
+                              return Center(
+                                  child: Column(
+                                children: <Widget>[
+                                  CircularProgressIndicator(),
+                                  Text("정보요청중...")
+                                ],
+                              ));
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-
 
           //두번째 페이지
           Container(
@@ -1020,7 +1057,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   Image.network(
                       "https://assets-ouch.icons8.com/thumb/628/9e2ae09a-5ef3-4b07-bcf1-6396638057d2.png"),
-                  SizedBox(height: 24,),
+                  SizedBox(
+                    height: 24,
+                  ),
                   Center(
                     child: Text("개발중...업데이트 예정"),
                   ),
@@ -1106,7 +1145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Image.network(
                     "https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
                 Center(
-                  child: Text("업데이트 예정"),
+                  child: Text("개발중...업데이트 예정"),
                 ),
               ],
             ),
@@ -1333,8 +1372,7 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String title = "새로운 버전 출시";
-        String message =
-            "지금보다 개선된 새로운 버전이 출시되었어요! 업데이트하시겠어요?";
+        String message = "지금보다 개선된 새로운 버전이 출시되었어요! 업데이트하시겠어요?";
         String btnLabel = "지금 업데이트";
         String btnLabelCancel = "나중에";
         return new AlertDialog(
@@ -1362,5 +1400,4 @@ class _MyHomePageState extends State<MyHomePage> {
       throw 'Could not launch $url';
     }
   }
-
 }

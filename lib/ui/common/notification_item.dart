@@ -34,10 +34,16 @@ class NotificationItem extends StatelessWidget {
                     );
                   },
                 ),
-                Text("현재 서비스 준비중 및 테스트 기간 입니다."),
-                Text(
-                  "내부적으로 오픈일정이 결정되기 전까지 서비스 이용을 제한합니다.",
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("☕️  ️현재 서비스 준비중 및 베타테스트 기간(-3/15) 입니다.",textAlign: TextAlign.start,),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "🛠 내부적으로 오픈 일정이 결정되기 전까지 서비스 이용을 잠시 제한합니다.",
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
