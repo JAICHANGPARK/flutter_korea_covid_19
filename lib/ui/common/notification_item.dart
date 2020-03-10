@@ -36,7 +36,7 @@ class NotificationItem extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("☕️  ️현재 서비스 준비중 및 베타테스트 기간(-3/15) 입니다.",textAlign: TextAlign.start,),
+                  child: Text("☕️  ️현재 서비스 준비중 및 시범운영 (베타테스트) 기간(-3/15) 입니다.", textAlign: TextAlign.start,),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
