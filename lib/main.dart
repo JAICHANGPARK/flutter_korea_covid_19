@@ -9,6 +9,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttermasktest/model/api_keys.dart';
 import 'package:fluttermasktest/model/naver_reversegeocode.dart' as ng;
 
 import 'package:fluttermasktest/model/recent.dart';
@@ -104,6 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
   String onClickStateText = "";
   List<Stores> onClickStoreList = [];
 
+
+  String mapApiId = "";
+  String mapApiKey = "";
+
+  Future<ApiKeys> getApiKeys(String path)async{
+    String data = await DefaultAssetBundle.of(context).loadString(path);
+    ApiKeys jsonResult = ApiKeys.fromJson(json.decode(data));
+    print(jsonResult.toString());
+    return jsonResult;
+  }
   Future<StoreSaleResult> getMask(String lat, String lng, String range) async {
     var url =
         'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
@@ -119,14 +130,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<String> getUserAddress(String lat, String lng) async {
+  Future<String> getUserAddress(String apiId, String apiKey, String lat, String lng) async {
     var url =
         'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${lng},${lat}&output=json';
     var response = await http.get(
       url,
       headers: {
-        'X-NCP-APIGW-API-KEY-ID': '5wusqxusb3',
-        'X-NCP-APIGW-API-KEY': '60YESq180I6pAqJiJAc9W04EjQMS9PfEBjBe3ikN',
+        'X-NCP-APIGW-API-KEY-ID': apiId,
+        'X-NCP-APIGW-API-KEY': apiKey,
       },
     );
     print('Response status: ${response.statusCode}');
@@ -145,6 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } else if (response.statusCode == HttpStatus.notFound) {
       return "404";
+    }else{
+      return "";
     }
   }
 
@@ -340,6 +353,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     firebaseCloudMessagingListeners();
+
+    getApiKeys('assets/api_key.json').then((value){
+      mapApiId = value.mapApiKey.xNCPAPIGWAPIKEYID;
+      mapApiKey = value.mapApiKey.xNCPAPIGWAPIKEY;
+    });
+
 
     getUserServiceAgree().then((v) async {
       userServiceAgree = v;
@@ -1563,6 +1582,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                       onClickStateText = "주소 정보 가져오는 중...";
                                     });
                                     getUserAddress(
+                                        mapApiId,
+                                            mapApiKey,
                                             _locationData.latitude.toString(),
                                             _locationData.longitude.toString())
                                         .then((value) {
@@ -1969,7 +1990,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     setState(() {
                       onClickProcessState = OnClickProcessState.start;
                     });
-                    getUserAddress(_locationData.latitude.toString(),
+                    getUserAddress( mapApiId,
+                        mapApiKey,_locationData.latitude.toString(),
                         _locationData.longitude.toString());
                   } else {
                     _locationData = await location.getLocation();
