@@ -872,49 +872,53 @@ class _MyHomePageState extends State<MyHomePage> {
                               resultList = snapshot.data;
                               stores = resultList.stores;
                               if (stores.length > 0) {
-                                return ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: stores.length,
-                                    itemBuilder: (context, index) {
-                                      Color stockColor;
-                                      Color stockTextColor;
-                                      String stockText = "알수없음";
-                                      String remain = stores[index].remainStat;
-                                      if (remain == "plenty") {
-                                        stockColor = Colors.lightGreen;
-                                        stockText = "100개 이상";
-                                        stockTextColor = Colors.white;
-                                      } else if (remain == "some") {
-                                        stockColor = Colors.yellow;
-                                        stockText = "30개이상 100개미만";
-                                        stockTextColor = Colors.black;
-                                      } else if (remain == "few") {
-                                        stockColor = Colors.red;
-                                        stockText = "30개 미만";
-                                        stockTextColor = Colors.white;
-                                      } else if (remain == "empty") {
-                                        stockColor = Colors.grey;
-                                        stockText = "재고없음";
-                                        stockTextColor = Colors.white;
-                                      } else {
-                                        stockColor = Colors.grey;
-                                        stockText = "등록된 정보없음";
-                                        stockTextColor = Colors.white;
-                                      }
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: stores.length,
+                                      itemBuilder: (context, index) {
+                                        Color stockColor;
+                                        Color stockTextColor;
+                                        String stockText = "알수없음";
+                                        String remain = stores[index].remainStat;
+                                        String type = stores[index].type;
+                                        String typeText;
+                                        if(type == "01"){
+                                          typeText = "약국";
+                                        }else if(type == "02"){
+                                          typeText = "우체국";
+                                        }
+                                        else if(type == "03"){
+                                          typeText = "농협";
+                                        }
+                                        else {
+                                          typeText = "정보없음";
+                                        }
 
-                                      return GestureDetector(
-                                        onTap: (){
-                                          Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (context){
-                                              return InformationWebViewPage(url:
-                                              " https://www.google.com/maps/place/${stores[index].name}/@${stores[index].lat},${stores[index].lng},18z?hl=ko",
-                                              title: stores[index].name,);
-                                            }
-                                          ));
+                                        if (remain == "plenty") {
+                                          stockColor = Colors.lightGreen;
+                                          stockText = "100개 이상";
+                                          stockTextColor = Colors.white;
+                                        } else if (remain == "some") {
+                                          stockColor = Colors.yellow;
+                                          stockText = "30개이상~\n100개미만";
+                                          stockTextColor = Colors.black;
+                                        } else if (remain == "few") {
+                                          stockColor = Colors.red;
+                                          stockText = "30개 미만";
+                                          stockTextColor = Colors.white;
+                                        } else if (remain == "empty") {
+                                          stockColor = Colors.grey;
+                                          stockText = "재고없음";
+                                          stockTextColor = Colors.white;
+                                        } else {
+                                          stockColor = Colors.grey;
+                                          stockText = "등록된 정보없음";
+                                          stockTextColor = Colors.white;
+                                        }
 
-
-                                        },
-                                        child: Container(
+                                        return Container(
                                           margin: EdgeInsets.only(
                                               bottom: 16, left: 8, right: 8),
                                           decoration: BoxDecoration(
@@ -942,18 +946,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           .spaceBetween,
                                                   children: <Widget>[
                                                     Container(
-                                                      padding: EdgeInsets.all(12),
-                                                      width: 120,
+                                                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                                                       decoration: BoxDecoration(
                                                           color: Colors.white,
                                                           borderRadius:
                                                               BorderRadius.only(
                                                             topLeft:
                                                                 Radius.circular(
-                                                                    24),
+                                                                    20),
                                                             bottomRight:
                                                                 Radius.circular(
-                                                                    24),
+                                                                    20),
                                                           ),
                                                           boxShadow: [
                                                             BoxShadow(
@@ -964,7 +967,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                 blurRadius: 3,
                                                                 spreadRadius: 2,
                                                                 offset:
-                                                                    Offset(4, 4)),
+                                                                    Offset(2, 2)),
                                                             BoxShadow(
                                                                 color: Colors
                                                                     .black
@@ -976,7 +979,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                     -2, -2)),
                                                           ]),
                                                       child: Center(
-                                                          child: Text("약국")),
+                                                          child: Text("약국",style: TextStyle(fontWeight: FontWeight.bold),)),
                                                     ),
                                                     Column(
                                                       crossAxisAlignment:
@@ -1063,8 +1066,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      );
+                                        );
 
 //                                    return Card(
 //                                      color: stores[index].soldOut
@@ -1098,7 +1100,8 @@ class _MyHomePageState extends State<MyHomePage> {
 //                                        ),
 //                                      ),
 //                                    );
-                                    });
+                                      }),
+                                );
                               } else {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
