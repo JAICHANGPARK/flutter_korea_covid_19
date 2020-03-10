@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+FirebaseAnalytics analytics = FirebaseAnalytics();
+
 void main() async {
   runApp(MyApp());
 }
@@ -32,6 +36,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
       theme: ThemeData(
@@ -501,6 +508,97 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: "공적마스크 관련 QnA",
                           )));
                 }),
+
+            ListTile(
+              title: Text('정보'),
+              leading: Icon(Icons.info_outline),
+            ),
+            Divider(
+              height: 0,
+              thickness: 1.2,
+            ),
+            ListTile(
+              title: Text("유의사항"),
+              subtitle: Text(
+                "제공되는 데이터는 5분-10분 정도 실제 재고와 차이가 있을 수 있습니다",
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+            ListTile(
+                title: Text("데이터 제공"),
+                subtitle: Text(
+                  "공공데이터포털(건강보험심사평가원)",
+                  style: TextStyle(fontSize: 12),
+                )),
+
+            ListTile(
+              title: Text(
+                "서비스 이용 동의",
+              ),
+              subtitle: userServiceAgree
+                  ? Text(
+                "서비스 사용 동의 처리완료",
+                style: TextStyle(fontSize: 12),
+              )
+                  : Text(
+                "서비스 사용 동의 미완료",
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+            ExpansionTile(
+              title: Text("개발자 정보"),
+              children: <Widget>[
+                ListTile(
+                  title: Text("개발"),
+                  subtitle: Text("박제창 (Dreamwalker)"),
+                ),
+                ListTile(
+                  title: Text("이메일"),
+                  subtitle: Text("aristojeff@gmail.com"),
+                  onTap: (){
+                    _launchEmail("aristojeff@gmail.com");
+                  },
+                ),
+                ListTile(
+                  title: Text("리포지토리"),
+                  subtitle: Text("https://github.com/JAICHANGPARK"),
+                ),
+              ],
+            ),
+
+            ExpansionTile(
+              title: Text("기술지원 및 문의"),
+              children: <Widget>[
+                ListTile(
+                  onTap: (){
+                    _launchEmail("aristojeff@gmail.com");
+                  },
+                  title: Text('기술 및 앱 관련문의'),
+                  subtitle: Text("aristojeff@gmail.com"),
+                ),
+                ListTile(
+                  title: Text("데이터 문의(한국정보화진흥원)"),
+                  subtitle: Text("maskdata@nia.or.kr"),
+                  onTap: (){
+                    _launchEmail("maskdata@nia.or.kr");
+                  },
+                )
+              ],
+            ),
+            ListTile(
+              title: Text('앱정보'),
+              onTap: () {
+                showAboutDialog(
+                    context: context,
+                    applicationName: "공적마스크 검색이",
+                    applicationVersion: version,
+                    applicationIcon: Image.asset(
+                      'assets/icon/icons2/playstore.png',
+                      width: 64,
+                      height: 64,
+                    ));
+              },
+            ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("설정"),
@@ -521,72 +619,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
                 Navigator.of(context).pop();
               },
-            ),
-            ListTile(
-              title: Text('정보'),
-              leading: Icon(Icons.info_outline),
-            ),
-            Divider(
-              height: 0,
-              thickness: 1.2,
-            ),
-            ExpansionTile(
-              title: Text("개발자 정보"),
-              children: <Widget>[
-                ListTile(
-                  title: Text("개발"),
-                  subtitle: Text("박제창 (Dreamwalker)"),
-                ),
-                ListTile(
-                  title: Text("이메일 (문의하기)"),
-                  subtitle: Text("aristojeff@gmail.com"),
-                ),
-                ListTile(
-                  title: Text("리포지토리"),
-                  subtitle: Text("https://github.com/JAICHANGPARK"),
-                ),
-              ],
-            ),
-            ListTile(
-              title: Text('앱정보'),
-              onTap: () {
-                showAboutDialog(
-                    context: context,
-                    applicationName: "공적마스크 검색이",
-                    applicationVersion: version,
-                    applicationIcon: Image.asset(
-                      'assets/icon/icons2/playstore.png',
-                      width: 64,
-                      height: 64,
-                    ));
-              },
-            ),
-            ListTile(
-              title: Text("유의사항"),
-              subtitle: Text(
-                "5분 이상 전의 데이터로 실제 재고와 차이가 있을 수 있습니다",
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
-            ListTile(
-                title: Text("정보 제공"),
-                subtitle: Text(
-                  "공공데이터포털(건강보험심사평가원)",
-                  style: TextStyle(fontSize: 12),
-                )),
-            ListTile(
-              title: Text(
-                "서비스 이용 동의",
-              ),
-              subtitle: userServiceAgree
-                  ? Text(
-                      "서비스 사용 동의 처리완료",
-                      style: TextStyle(fontSize: 12),
-                    )
-                  : Text(
-                      "서비스 사용 동의 미완료",
-                      style: TextStyle(fontSize: 12),
-                    ),
             ),
           ],
         ),
@@ -930,7 +962,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       CrossAxisAlignment.end,
                                                   children: <Widget>[
                                                     Text(
-                                                      "입고시간: ${stores[index].stockT}",
+                                                      "입고시간: ${stores[index].stockAt}",
                                                       style: TextStyle(
                                                           fontSize: 12),
                                                     ),
@@ -1398,6 +1430,14 @@ class _MyHomePageState extends State<MyHomePage> {
       await launch(url);
     } else {
       throw 'Could not launch $url';
+    }
+  }
+
+  _launchEmail(String email) async {
+    if (await canLaunch("mailto:$email")) {
+      await launch("mailto:$email");
+    } else {
+      throw 'Could not launch';
     }
   }
 }
