@@ -45,6 +45,13 @@ class NotificationItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "🛠 1차 서비스 시작은 3월 11일 오전 8시 오픈 예정입니다.",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ],
             ),
           ),

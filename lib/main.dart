@@ -447,14 +447,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SimpleDialog(
                   contentPadding: EdgeInsets.all(16),
                   children: <Widget>[
-                    Text(
-                        "1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분 이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
-                    Text(
-                        "2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 오른쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
+                    Text("1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
+                    Text("2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 왼쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
                     Text("3. 위치정보는 주변 약국을 검색하기 위해 사용됩니다."),
-                    Text("4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다."),
-                    Text(
-                        "5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
+                    Text("4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다. 따뜻한 응원의 메시지를 전하면 어떨까요?"),
+                    Text("5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
                     SizedBox(
                       height: 16,
                     ),
@@ -656,6 +653,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
+              title: Text("정보 제공 시간"),
+              subtitle: Text(
+                "제공되는 데이터는 매일 오전8시부터 저녁11시까지 갱신되어 제공됩니다.",
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+            ListTile(
                 title: Text("데이터 제공"),
                 subtitle: Text(
                   "공공데이터포털(건강보험심사평가원)",
@@ -805,9 +809,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             labelText: "반경(m)",
                                             hintText: "100m(최대 5000m)"),
                                         onChanged: (value) {
-                                          if (int.parse(value) > 5000) {
-                                            rangeTextController.text = "5000";
-                                          }
+
                                         },
                                       ),
                                     ),
@@ -818,6 +820,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           MaterialButton(
                                             child: Text('검색'),
                                             onPressed: () {
+                                              if (int.parse( rangeTextController.text) > 5000) {
+                                                rangeTextController.text = "5000";
+                                              }
                                               FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
@@ -1637,7 +1642,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: <Widget>[
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text('정보 없음'),
+                                    child: Text('근처 판매점이 존재하지 않아요😫'),
                                   ),
                                   MaterialButton(
                                     color: Colors.teal,
