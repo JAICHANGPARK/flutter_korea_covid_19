@@ -7,9 +7,10 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttermasktest/model/mask.dart';
+
 import 'package:fluttermasktest/model/recent.dart';
 import 'package:fluttermasktest/model/search.dart';
+import 'package:fluttermasktest/model/store_sale_result.dart';
 import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
 import 'package:fluttermasktest/utils/app_string.dart';
@@ -63,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var box;
   int pageIndex = 0;
   bool appPublishFlag = false;
-  Mask resultList;
+  StoreSaleResult resultList;
   List<Stores> stores;
   String userDay = "";
   String userBirth = "";
@@ -71,8 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
-  TextEditingController rangeTextController =
-      TextEditingController(text: "100");
+  TextEditingController rangeTextController =TextEditingController();
   TextEditingController birthTextController = TextEditingController();
 
   Location location = new Location();
@@ -86,14 +86,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool userServiceAgree = false;
   String version;
 
-  Future<Mask> getMask(String lat, String lng, String range) async {
+  Future<StoreSaleResult> getMask(String lat, String lng, String range) async {
     var url =
         'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
     var response = await http.get(url);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
-      Mask m = Mask.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+      StoreSaleResult m = StoreSaleResult.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
       return m;
     } else {
       return null;
@@ -242,10 +243,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
 
     getUserServiceAgree().then((v) async {
       userServiceAgree = v;
+
+      //사용자 서비스 이용 동의가 완료된 경우
       if (v) {
         checkLocationPermission().then((result) async {
           print(result);
@@ -273,6 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
             getSearchLog().then((r) {
               latTextController.text = r.lat;
               lngTextController.text = r.lng;
+              print("저장된 거리값 : ${r.range}");
               if (r.range == "") {
                 defaultRange = r.range;
                 rangeTextController.text = "100";
@@ -282,43 +285,39 @@ class _MyHomePageState extends State<MyHomePage> {
               getAppVersion().then((b) async {
                 if (b) {
                   _showVersionDialog(context);
-
-//                  await showDialog(context: context, builder: (context){
-//                    return AlertDialog(
-//                      content: Text('최신 버전이 존재합니다. 업데이트 하시겠습니까?'),
-//                      actions: <Widget>[
-//                        ButtonBar(
-//                          children: <Widget>[
-//                            FlatButton(
-//                              onPressed: () {  },
-//                              child: Text("확인"),
-//                            ),
-//                            FlatButton(
-//                              onPressed: () {
-//                                Navigator.of(context).pop();
-//                              },
-//                              child: Text("나중에"),
-//                            )
-//                          ],
-//                        )
-//                      ],
-//                    );
-//                  });
                 }
               });
             });
           } else {
-            getAppVersion().then((b) async {
-              if (b) {
-                _showVersionDialog(context);
+            getSearchLog().then((r) {
+              latTextController.text = r.lat;
+              lngTextController.text = r.lng;
+              print("저장된 거리값 : ${r.range}");
+              if (r.range == "") {
+                defaultRange = r.range;
+                rangeTextController.text = "100";
+              } else {
+                rangeTextController.text = r.range;
               }
+              getAppVersion().then((b) async {
+                if (b) {
+                  _showVersionDialog(context);
+                }
+              });
             });
+//            getAppVersion().then((b) async {
+//              if (b) {
+//                _showVersionDialog(context);
+//              }
+//            });
             setState(() {
               appPublishFlag = false;
             });
           }
         });
       }
+
+      //사용자 서비스 이용 동의가 완료된 경우
       //사용자 동의구하기
       else {
         await showDialog(
@@ -441,6 +440,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       setState(() {});
     });
+
+    super.initState();
   }
 
   String addressJSON = '';
@@ -508,7 +509,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: "공적마스크 관련 QnA",
                           )));
                 }),
-
             ListTile(
               title: Text('정보'),
               leading: Icon(Icons.info_outline),
@@ -530,20 +530,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   "공공데이터포털(건강보험심사평가원)",
                   style: TextStyle(fontSize: 12),
                 )),
-
             ListTile(
               title: Text(
                 "서비스 이용 동의",
               ),
               subtitle: userServiceAgree
                   ? Text(
-                "서비스 사용 동의 처리완료",
-                style: TextStyle(fontSize: 12),
-              )
+                      "서비스 사용 동의 처리완료",
+                      style: TextStyle(fontSize: 12),
+                    )
                   : Text(
-                "서비스 사용 동의 미완료",
-                style: TextStyle(fontSize: 12),
-              ),
+                      "서비스 사용 동의 미완료",
+                      style: TextStyle(fontSize: 12),
+                    ),
             ),
             ExpansionTile(
               title: Text("개발자 정보"),
@@ -555,7 +554,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ListTile(
                   title: Text("이메일"),
                   subtitle: Text("aristojeff@gmail.com"),
-                  onTap: (){
+                  onTap: () {
                     _launchEmail("aristojeff@gmail.com");
                   },
                 ),
@@ -565,12 +564,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-
             ExpansionTile(
               title: Text("기술지원 및 문의"),
               children: <Widget>[
                 ListTile(
-                  onTap: (){
+                  onTap: () {
                     _launchEmail("aristojeff@gmail.com");
                   },
                   title: Text('기술 및 앱 관련문의'),
@@ -579,7 +577,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ListTile(
                   title: Text("데이터 문의(한국정보화진흥원)"),
                   subtitle: Text("maskdata@nia.or.kr"),
-                  onTap: (){
+                  onTap: () {
                     _launchEmail("maskdata@nia.or.kr");
                   },
                 )
@@ -631,117 +629,113 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(
         index: pageIndex,
         children: <Widget>[
-          !appPublishFlag
-              ? NotificationItem()
-              :
+//          !appPublishFlag
+//              ? NotificationItem()
+//              :
 
-              //첫번쨰 페이지
-              SingleChildScrollView(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    children: <Widget>[
-                      Card(
-                        elevation: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16, right: 16, top: 16, bottom: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+          //첫번쨰 페이지
+          SingleChildScrollView(
+            padding: EdgeInsets.all(8),
+            child: Column(
+              children: <Widget>[
+                Card(
+                  elevation: 6,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16, right: 16, top: 16, bottom: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "검색 반경 설정",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        Text(
+                          "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 100m)",
+                          style: Theme.of(context).textTheme.caption,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Row(
                             children: <Widget>[
-                              Text(
-                                "검색 반경 설정",
-                                style: Theme.of(context).textTheme.headline5,
+                              Expanded(
+                                flex: 8,
+                                child: TextField(
+                                  autofocus: false,
+                                  inputFormatters: [
+                                    WhitelistingTextInputFormatter.digitsOnly
+                                  ],
+                                  keyboardType: TextInputType.number,
+                                  controller: rangeTextController,
+                                  decoration: InputDecoration(
+                                      suffix: Text("m"),
+                                      border: OutlineInputBorder(),
+                                      labelText: "반경(m)",
+                                      hintText: "10m(최대 10000m)"),
+                                  onChanged: (value) {
+                                    if (int.parse(value) > 10000) {
+                                      rangeTextController.text = "10000";
+                                    }
+                                  },
+                                ),
                               ),
-                              Text(
-                                "현재 위치를 기반으로 검색 반경을 지정할 수 있습니다. (기본 100m)",
-                                style: Theme.of(context).textTheme.caption,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 16),
-                                child: Row(
+                              Expanded(
+                                flex: 3,
+                                child: ButtonBar(
                                   children: <Widget>[
-                                    Expanded(
-                                      flex: 8,
-                                      child: TextField(
-                                        autofocus: false,
-                                        inputFormatters: [
-                                          WhitelistingTextInputFormatter
-                                              .digitsOnly
-                                        ],
-                                        keyboardType: TextInputType.number,
-                                        controller: rangeTextController,
-                                        decoration: InputDecoration(
-                                            suffix: Text("m"),
-                                            border: OutlineInputBorder(),
-                                            labelText: "반경(m)",
-                                            hintText: "10m(최대 10000m)"),
-                                        onChanged: (value) {
-                                          if (int.parse(value) > 10000) {
-                                            rangeTextController.text = "10000";
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: ButtonBar(
-                                        children: <Widget>[
-                                          MaterialButton(
-                                            child: Text('검색'),
-                                            onPressed: () {
-                                              FocusScope.of(context).unfocus();
+                                    MaterialButton(
+                                      child: Text('검색'),
+                                      onPressed: () {
+                                        FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
-                                              String r =
-                                                  rangeTextController.text;
+                                        String r = rangeTextController.text;
 
-                                              if (
+                                        if (
 //                              lat.length > 0 &&
 //                                  lng.length > 0 &&
-                                                  _locationData != null &&
-                                                      r.length > 0) {
-                                                print(
-                                                    "latitude : ${_locationData.latitude.toString()}");
-                                                print(
-                                                    "longitude : ${_locationData.longitude.toString()}");
-                                                if (stores.length > 0 &&
-                                                    stores != null) {
-                                                  stores.clear();
-                                                  getMask(
-                                                      _locationData.latitude
-                                                          .toString(),
-                                                      _locationData.longitude
-                                                          .toString(),
-                                                      r);
-                                                }
-                                                setSearchLog(
-                                                    _locationData.latitude
-                                                        .toString(),
-                                                    _locationData.longitude
-                                                        .toString(),
-                                                    r);
-                                              } else {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        AlertDialog(
-                                                          content: Text(
-                                                              "모든 조건을 입력해주세요"),
-                                                        ));
-                                              }
-                                            },
-                                            color: Colors.teal,
-                                          )
-                                        ],
-                                      ),
+                                            _locationData != null &&
+                                                r.length > 0) {
+                                          print(
+                                              "latitude : ${_locationData.latitude.toString()}");
+                                          print(
+                                              "longitude : ${_locationData.longitude.toString()}");
+                                          if (stores.length > 0 &&
+                                              stores != null) {
+                                            stores.clear();
+                                            getMask(
+                                                _locationData.latitude
+                                                    .toString(),
+                                                _locationData.longitude
+                                                    .toString(),
+                                                r);
+                                          }
+                                          setSearchLog(
+                                              _locationData.latitude.toString(),
+                                              _locationData.longitude
+                                                  .toString(),
+                                              r);
+                                        } else {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                    content:
+                                                        Text("모든 조건을 입력해주세요"),
+                                                  ));
+                                        }
+                                      },
+                                      color: Colors.teal,
                                     )
                                   ],
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
-                      ),
+                      ],
+                    ),
+                  ),
+                ),
 
 //                      Container(
 //                        margin: EdgeInsets.only(top: 16),
@@ -860,172 +854,217 @@ class _MyHomePageState extends State<MyHomePage> {
 //                        ),
 //
 
-                      Container(
-                        height: MediaQuery.of(context).size.height / 1.8,
-                        width: MediaQuery.of(context).size.width,
-                        child: FutureBuilder<Mask>(
-                          future: getMask(latTextController.text,
-                              lngTextController.text, rangeTextController.text),
+                Container(
+                  height: MediaQuery.of(context).size.height / 1.8,
+                  width: MediaQuery.of(context).size.width,
+                  child: _locationData != null
+                      ? FutureBuilder<StoreSaleResult>(
+                          future: getMask(
+                              _locationData.latitude.toString(),
+                              _locationData.longitude.toString(),
+                              rangeTextController.text),
                           builder: (context, snapshot) {
-                            if (snapshot.data == null)
-                              return Center(
-                                child: Text("다시 시도해주세요 "),
-                              );
+//                            if (snapshot.data == null)
+//                              return Center(
+//                                child: Text("다시 시도해주세요 "),
+//                              );
                             if (snapshot.hasData) {
                               resultList = snapshot.data;
                               stores = resultList.stores;
-                              return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: stores.length,
-                                  itemBuilder: (context, index) {
-                                    Color stockColor;
-                                    String stockText = "알수없음";
-                                    String remain = stores[index].remainStat;
-                                    if (remain == "plenty") {
-                                      stockColor = Colors.lightGreen;
-                                      stockText = "100개 이상";
-                                    } else if (remain == "some") {
-                                      stockColor = Colors.yellow;
-                                      stockText = "30개이상 100개미만";
-                                    } else if (remain == "few") {
-                                      stockColor = Colors.red;
-                                      stockText = "30개 미만";
-                                    } else if (remain == "empty") {
-                                      stockColor = Colors.grey;
-                                      stockText = "재고없음";
-                                    } else {
-                                      stockText = "알수없음";
-                                    }
+                              if (stores.length > 0) {
+                                return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: stores.length,
+                                    itemBuilder: (context, index) {
+                                      Color stockColor;
+                                      Color stockTextColor;
+                                      String stockText = "알수없음";
+                                      String remain = stores[index].remainStat;
+                                      if (remain == "plenty") {
+                                        stockColor = Colors.lightGreen;
+                                        stockText = "100개 이상";
+                                        stockTextColor = Colors.white;
+                                      } else if (remain == "some") {
+                                        stockColor = Colors.yellow;
+                                        stockText = "30개이상 100개미만";
+                                        stockTextColor = Colors.black;
+                                      } else if (remain == "few") {
+                                        stockColor = Colors.red;
+                                        stockText = "30개 미만";
+                                        stockTextColor = Colors.white;
+                                      } else if (remain == "empty") {
+                                        stockColor = Colors.grey;
+                                        stockText = "재고없음";
+                                        stockTextColor = Colors.white;
+                                      } else {
+                                        stockColor = Colors.grey;
+                                        stockText = "등록된 정보없음";
+                                        stockTextColor = Colors.white;
+                                      }
 
-                                    return Container(
-                                      margin: EdgeInsets.only(
-                                          bottom: 16, left: 8, right: 8),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(38),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
-                                                blurRadius: 2,
-                                                spreadRadius: 1,
-                                                offset: Offset(2, 2))
-                                          ]),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                      return GestureDetector(
+                                        onTap: (){
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (context){
+                                              return InformationWebViewPage(url:
+                                              " https://www.google.com/maps/place/${stores[index].name}/@${stores[index].lat},${stores[index].lng},18z?hl=ko",
+                                              title: stores[index].name,);
+                                            }
+                                          ));
+
+
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                              bottom: 16, left: 8, right: 8),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(38),
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 2,
+                                                    spreadRadius: 1,
+                                                    offset: Offset(2, 2))
+                                              ]),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                Container(
-                                                  padding: EdgeInsets.all(12),
-                                                  width: 120,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(24),
-                                                        bottomRight:
-                                                            Radius.circular(24),
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.15),
-                                                            blurRadius: 3,
-                                                            spreadRadius: 2,
-                                                            offset:
-                                                                Offset(4, 4)),
-                                                        BoxShadow(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.05),
-                                                            blurRadius: 1,
-                                                            spreadRadius: 1,
-                                                            offset:
-                                                                Offset(-2, -2)),
-                                                      ]),
-                                                  child:
-                                                      Center(child: Text("약국")),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: <Widget>[
-                                                    Text(
-                                                      "입고시간: ${stores[index].stockAt}",
-                                                      style: TextStyle(
-                                                          fontSize: 12),
+                                                    Container(
+                                                      padding: EdgeInsets.all(12),
+                                                      width: 120,
+                                                      decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    24),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    24),
+                                                          ),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.15),
+                                                                blurRadius: 3,
+                                                                spreadRadius: 2,
+                                                                offset:
+                                                                    Offset(4, 4)),
+                                                            BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.05),
+                                                                blurRadius: 1,
+                                                                spreadRadius: 1,
+                                                                offset: Offset(
+                                                                    -2, -2)),
+                                                          ]),
+                                                      child: Center(
+                                                          child: Text("약국")),
                                                     ),
-                                                    Text(
-                                                      "생성일: ${stores[index].createdAt}",
-                                                      style: TextStyle(
-                                                          fontSize: 12),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.end,
+                                                      children: <Widget>[
+                                                        stores[index].stockAt !=
+                                                                null
+                                                            ? Text(
+                                                                "입고시간: ${stores[index].stockAt}",
+                                                                style: TextStyle(
+                                                                    fontSize: 12),
+                                                              )
+                                                            : Text(
+                                                                "입고시간: 정보없음",
+                                                                style: TextStyle(
+                                                                    fontSize: 12),
+                                                              ),
+                                                        Text(
+                                                          "생성일: ${stores[index].createdAt}",
+                                                          style: TextStyle(
+                                                              fontSize: 12),
+                                                        )
+                                                      ],
                                                     )
                                                   ],
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 16,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: <Widget>[
-                                                Expanded(
-                                                  flex: 6,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      Text(
-                                                        "판매처: ${stores[index].name}",
-                                                        style: TextStyle(
-                                                            fontSize: 16),
-                                                      ),
-                                                      Text(
-                                                        "${stores[index].addr}",
-                                                        style: TextStyle(
-                                                            fontSize: 12),
-                                                      )
-                                                    ],
-                                                  ),
                                                 ),
-                                                Expanded(
-                                                    flex: 3,
-                                                    child: Container(
-                                                      height: 38,
-                                                      width: 38,
-                                                      decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .lightGreen),
-                                                      child: Center(
-                                                        child: Text(
-                                                          stockText,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  stockColor),
-                                                        ),
+                                                SizedBox(
+                                                  height: 16,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            "판매처: ${stores[index].name}",
+                                                            style: TextStyle(
+                                                                fontSize: 16),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 48),
+                                                            child: Text(
+                                                              "${stores[index].addr}",
+                                                              style: TextStyle(
+                                                                  fontSize: 12),
+                                                            ),
+                                                          )
+                                                        ],
                                                       ),
-                                                    )),
+                                                    ),
+                                                    Expanded(
+                                                        flex: 3,
+                                                        child: Container(
+                                                          padding:
+                                                              EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  color:
+                                                                      stockColor),
+                                                          child: Center(
+                                                            child: Text(
+                                                              stockText,
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      stockTextColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )),
+                                                  ],
+                                                ),
                                               ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
 
 //                                    return Card(
 //                                      color: stores[index].soldOut
@@ -1059,22 +1098,34 @@ class _MyHomePageState extends State<MyHomePage> {
 //                                        ),
 //                                      ),
 //                                    );
-                                  });
+                                    });
+                              } else {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    CircularProgressIndicator(),
+                                    Text("잠시만 기다려주세요...")
+                                  ],
+                                );
+                              }
                             } else {
-                              return Center(
-                                  child: Column(
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   CircularProgressIndicator(),
                                   Text("정보요청중...")
                                 ],
-                              ));
+                              );
                             }
                           },
-                        ),
-                      ),
-                    ],
-                  ),
+                        )
+                      : Center(child: Text("위치정보 받아오는 중...")),
                 ),
+              ],
+            ),
+          ),
 
           //두번째 페이지
           Container(
@@ -1369,19 +1420,24 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: pageIndex == 0
           ? FloatingActionButton(
               onPressed: () {
-                if (appPublishFlag) {
-                  setState(() {
-                    if (stores != null) {
-                      stores.clear();
-                    }
-                  });
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            content: Text("현재 이용할 수 없습니다."),
-                          ));
-                }
+//                if (appPublishFlag) {
+//                  setState(() {
+//                    if (stores != null) {
+//                      stores.clear();
+//                    }
+//                  });
+//                } else {
+//                  showDialog(
+//                      context: context,
+//                      builder: (context) => AlertDialog(
+//                            content: Text("현재 이용할 수 없습니다."),
+//                          ));
+//                }
+                setState(() {
+                  if (stores != null) {
+                    stores.clear();
+                  }
+                });
               },
               tooltip: 'Refresh',
               child: Icon(Icons.refresh),
