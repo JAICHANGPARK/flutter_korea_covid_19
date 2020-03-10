@@ -15,10 +15,12 @@ import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
 import 'package:fluttermasktest/utils/app_string.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hive/hive.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:kopo/kopo.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:location/location.dart';
 import 'package:package_info/package_info.dart';
 import 'dart:convert';
@@ -72,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
-  TextEditingController rangeTextController =TextEditingController();
+  TextEditingController rangeTextController = TextEditingController();
   TextEditingController birthTextController = TextEditingController();
 
   Location location = new Location();
@@ -671,10 +673,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                       suffix: Text("m"),
                                       border: OutlineInputBorder(),
                                       labelText: "반경(m)",
-                                      hintText: "10m(최대 10000m)"),
+                                      hintText: "100m(최대 5000m)"),
                                   onChanged: (value) {
-                                    if (int.parse(value) > 10000) {
-                                      rangeTextController.text = "10000";
+                                    if (int.parse(value) > 5000) {
+                                      rangeTextController.text = "5000";
                                     }
                                   },
                                 ),
@@ -875,24 +877,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 16),
                                   child: ListView.builder(
+                                      physics: BouncingScrollPhysics(),
                                       shrinkWrap: true,
                                       itemCount: stores.length,
                                       itemBuilder: (context, index) {
                                         Color stockColor;
                                         Color stockTextColor;
                                         String stockText = "알수없음";
-                                        String remain = stores[index].remainStat;
+                                        String remain =
+                                            stores[index].remainStat;
                                         String type = stores[index].type;
                                         String typeText;
-                                        if(type == "01"){
+                                        if (type == "01") {
                                           typeText = "약국";
-                                        }else if(type == "02"){
+                                        } else if (type == "02") {
                                           typeText = "우체국";
-                                        }
-                                        else if(type == "03"){
+                                        } else if (type == "03") {
                                           typeText = "농협";
-                                        }
-                                        else {
+                                        } else {
                                           typeText = "정보없음";
                                         }
 
@@ -925,6 +927,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(38),
+                                                bottomRight: Radius.circular(38),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
@@ -946,7 +949,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           .spaceBetween,
                                                   children: <Widget>[
                                                     Container(
-                                                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 8,
+                                                              horizontal: 24),
                                                       decoration: BoxDecoration(
                                                           color: Colors.white,
                                                           borderRadius:
@@ -966,8 +972,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                         0.15),
                                                                 blurRadius: 3,
                                                                 spreadRadius: 2,
-                                                                offset:
-                                                                    Offset(2, 2)),
+                                                                offset: Offset(
+                                                                    2, 2)),
                                                             BoxShadow(
                                                                 color: Colors
                                                                     .black
@@ -979,29 +985,48 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                     -2, -2)),
                                                           ]),
                                                       child: Center(
-                                                          child: Text("약국",style: TextStyle(fontWeight: FontWeight.bold),)),
+                                                          child: Text(
+                                                            typeText,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      )),
                                                     ),
                                                     Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.end,
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: <Widget>[
                                                         stores[index].stockAt !=
                                                                 null
                                                             ? Text(
                                                                 "입고시간: ${stores[index].stockAt}",
                                                                 style: TextStyle(
-                                                                    fontSize: 12),
+                                                                    fontSize:
+                                                                        12),
                                                               )
                                                             : Text(
                                                                 "입고시간: 정보없음",
                                                                 style: TextStyle(
-                                                                    fontSize: 12),
+                                                                    fontSize:
+                                                                        12),
                                                               ),
-                                                        Text(
-                                                          "생성일: ${stores[index].createdAt}",
-                                                          style: TextStyle(
-                                                              fontSize: 12),
-                                                        )
+                                                        stores[index]
+                                                                    .createdAt !=
+                                                                null
+                                                            ? Text(
+                                                                "생성일: ${stores[index].createdAt}",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12),
+                                                              )
+                                                            : Text(
+                                                                "생성일: 정보없음",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12),
+                                                              )
                                                       ],
                                                     )
                                                   ],
@@ -1021,21 +1046,40 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: <Widget>[
-                                                          Text(
-                                                            "판매처: ${stores[index].name}",
-                                                            style: TextStyle(
-                                                                fontSize: 16),
-                                                          ),
+                                                          stores[index].name !=
+                                                                  null
+                                                              ? Text(
+                                                                  "판매처: ${stores[index].name}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16),
+                                                                )
+                                                              : Text(
+                                                                  "판매처: 정보없음",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16),
+                                                                ),
                                                           Padding(
                                                             padding:
                                                                 const EdgeInsets
                                                                         .only(
                                                                     right: 48),
-                                                            child: Text(
-                                                              "${stores[index].addr}",
-                                                              style: TextStyle(
-                                                                  fontSize: 12),
-                                                            ),
+                                                            child: stores[index]
+                                                                        .addr !=
+                                                                    null
+                                                                ? SelectableText(
+                                                                    "${stores[index].addr}",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12),
+                                                                  )
+                                                                : Text(
+                                                                    "주소 정보없음",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12),
+                                                                  ),
                                                           )
                                                         ],
                                                       ),
@@ -1043,10 +1087,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     Expanded(
                                                         flex: 3,
                                                         child: Container(
-                                                          padding:
-                                                              EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 16,
+                                                                  horizontal:
+                                                                      8),
                                                           decoration:
                                                               BoxDecoration(
+
+                                                                borderRadius: BorderRadius.only(
+                                                                  bottomRight: Radius.circular(24),
+                                                                  topLeft: Radius.circular(24),
+                                                                ),
                                                                   color:
                                                                       stockColor),
                                                           child: Center(
@@ -1392,6 +1444,7 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
+
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: pageIndex,
           onTap: (newValue) {
@@ -1420,6 +1473,7 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
           ]),
+
       floatingActionButton: pageIndex == 0
           ? FloatingActionButton(
               onPressed: () {
