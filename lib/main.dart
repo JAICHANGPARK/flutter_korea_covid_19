@@ -771,18 +771,18 @@ class _MyHomePageState extends State<MyHomePage> {
           widget.title,
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => WebViewTest(
-                userLat: _locationData.latitude.toString(),
-                userLng: _locationData.longitude.toString(),
-                apiId: mapApiId,
-                apiKey: mapApiKey,
-              )));
-            },
-          )
+//          IconButton(
+//            icon: Icon(Icons.search),
+//            onPressed: () {
+//              Navigator.of(context).push(MaterialPageRoute(
+//                  builder: (context) => WebViewTest(
+//                        userLat: _locationData.latitude.toString(),
+//                        userLng: _locationData.longitude.toString(),
+//                        apiId: mapApiId,
+//                        apiKey: mapApiKey,
+//                      )));
+//            },
+//          )
         ],
       ),
       body: IndexedStack(
@@ -826,7 +826,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                               Text(
                                                   "근처의 총 ${onClickStoreList.length}개 판매처를 찾았어요."),
-
                                             ],
                                           ),
                                           Spacer(),
@@ -1064,13 +1063,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     Expanded(
                                                         flex: 3,
                                                         child: GestureDetector(
-                                                          onTap: (){
-                                                            _launchURL("geo:${stores[index].lat},${stores[index].lng}?q=${stores[index].name}");
+                                                          onTap: () {
+                                                            analytics.logEvent(name: "ClickToMap");
+                                                            _launchURL(
+                                                                "geo:${stores[index].lat},${stores[index].lng}?q=${stores[index].name}");
                                                           },
                                                           child: Container(
                                                             padding: EdgeInsets
                                                                 .symmetric(
-                                                                    vertical: 16,
+                                                                    vertical:
+                                                                        16,
                                                                     horizontal:
                                                                         8),
                                                             decoration:
@@ -1155,8 +1157,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: <Widget>[
                                   Image.network(
                                     "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
-                                    height:
-                                        MediaQuery.of(context).size.height / 3.5,
+                                    height: MediaQuery.of(context).size.height /
+                                        3.5,
                                     width:
                                         MediaQuery.of(context).size.width / 2,
                                   ),
@@ -1213,16 +1215,39 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   });
 
                                                   // 리스트 정렬
-                                                  onClickStoreList.addAll(tmpStores.where((f) => f.remainStat =="plenty").toList());
-                                                  onClickStoreList.addAll(tmpStores.where((f) => f.remainStat =="some").toList());
-                                                  onClickStoreList.addAll(tmpStores.where((f) => f.remainStat =="few").toList());
-                                                  onClickStoreList.addAll(tmpStores.where((f) => f.remainStat =="emtpy").toList());
-                                                  onClickStoreList.addAll(tmpStores.where((f) => f.remainStat ==null).toList());
-
+                                                  onClickStoreList.addAll(
+                                                      tmpStores
+                                                          .where((f) =>
+                                                              f.remainStat ==
+                                                              "plenty")
+                                                          .toList());
+                                                  onClickStoreList.addAll(
+                                                      tmpStores
+                                                          .where((f) =>
+                                                              f.remainStat ==
+                                                              "some")
+                                                          .toList());
+                                                  onClickStoreList.addAll(
+                                                      tmpStores
+                                                          .where((f) =>
+                                                              f.remainStat ==
+                                                              "few")
+                                                          .toList());
+                                                  onClickStoreList.addAll(
+                                                      tmpStores
+                                                          .where((f) =>
+                                                              f.remainStat ==
+                                                              "empty")
+                                                          .toList());
+                                                  onClickStoreList.addAll(
+                                                      tmpStores
+                                                          .where((f) =>
+                                                              f.remainStat ==
+                                                              null)
+                                                          .toList());
 
 //                                                  tmpStores.where((f) => f.stockAt =="empty").toList();
                                                   setState(() {
-
 //                                                    onClickStoreList =
 //                                                        tmpStores;
                                                     onClickCompleted = true;
@@ -1505,8 +1530,24 @@ class _MyHomePageState extends State<MyHomePage> {
 //                              );
                                   if (snapshot.hasData) {
                                     resultList = snapshot.data;
+
                                     stores = resultList.stores;
+
                                     if (stores.length > 0) {
+//                                      filterStores.addAll(stores.where((e) => e.remainStat == "plenty").toList());
+//                                      filterStores.addAll(stores.where((e) => e.remainStat == "some").toList());
+//                                      filterStores.addAll(stores.where((e) => e.remainStat == "few").toList());
+//                                      filterStores.addAll(stores.where((e) => e.remainStat == "empty").toList());
+//                                      filterStores.addAll(stores.where((e) => e.remainStat == "null").toList());
+//
+//
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == "plenty").toList());
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == "some").toList());
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == "few").toList());
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == "empty").toList());
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == "null").toList());
+//                                      stores.addAll(resultList.stores.where((e) => e.remainStat == null).toList());
+
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 16),
                                         child: ListView.builder(
@@ -1745,42 +1786,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         ),
                                                         Expanded(
                                                             flex: 3,
-                                                            child: GestureDetector(
-                                                              onTap: (){
-                                                                Navigator.of(context).push(MaterialPageRoute(builder:
-                                                                (context) => ShopDetailPage(_locationData.latitude,
-                                                                _locationData.longitude, stores[index],
-                                                                mapApiId, mapApiKey)));
-                                                              },
-                                                              child: Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            16,
-                                                                        horizontal:
-                                                                            8),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius
-                                                                                .only(
-                                                                          bottomRight:
-                                                                              Radius.circular(24),
-                                                                          topLeft:
-                                                                              Radius.circular(24),
-                                                                        ),
-                                                                        color:
-                                                                            stockColor),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    stockText,
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            stockTextColor,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .bold),
-                                                                  ),
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          16,
+                                                                      horizontal:
+                                                                          8),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .only(
+                                                                        bottomRight:
+                                                                            Radius.circular(24),
+                                                                        topLeft:
+                                                                            Radius.circular(24),
+                                                                      ),
+                                                                      color:
+                                                                          stockColor),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  stockText,
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          stockTextColor,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
                                                                 ),
                                                               ),
                                                             )),
@@ -1795,7 +1828,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       );
                                     }
 
-                                    //응답받은 결과가 0이 아닐떄
+                                    //응답받은 결과의 길이가 0이 아닐떄
                                     else {
                                       return Column(
                                         crossAxisAlignment:
@@ -1805,7 +1838,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         children: <Widget>[
                                           CircularProgressIndicator(),
                                           Text("잠시만 기다려주세요..."),
-                                          Text("네트워크 환경이 원할한 곳에서 사용해주세요"),
+                                          Text("접속량이 많아 다소 지연이 될수 있습니다."),
+                                          Text("권장: 네트워크 환경이 원할한 곳에서 사용해주세요."),
                                         ],
                                       );
                                     }
@@ -2140,6 +2174,18 @@ class _MyHomePageState extends State<MyHomePage> {
               "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
               height: MediaQuery.of(context).size.height / 3,
               width: MediaQuery.of(context).size.width / 2,
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes
+                        : null,
+                  ),
+                );
+              },
             ),
             GestureDetector(
               onTap: () async {
