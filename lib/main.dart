@@ -1380,7 +1380,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 rangeTextController.text =
                                                     "5000";
                                               }
-                                              FocusScope.of(context).unfocus();
+//                                              FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
                                               String r =
@@ -1433,123 +1433,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-
-//                      Container(
-//                        margin: EdgeInsets.only(top: 16),
-//                        height: MediaQuery.of(context).size.height / 1.8,
-//                        width: MediaQuery.of(context).size.width,
-//                        child: ListView(
-//                          shrinkWrap: true,
-//                          children: <Widget>[
-//                            Container(
-//                              margin: EdgeInsets.only(bottom: 16, left: 8, right: 8),
-//                              decoration: BoxDecoration(
-//                                color: Colors.white,
-//                                borderRadius: BorderRadius.only(
-//                                  topLeft: Radius.circular(38),
-//                                ),
-//                                boxShadow: [
-//                                  BoxShadow(
-//                                    color: Colors.black.withOpacity(0.2),
-//                                    blurRadius: 2,
-//                                    spreadRadius: 1,
-//                                    offset: Offset(2,2)
-//                                  )
-//                                ]
-//                              ),
-//                              child: Padding(
-//                                padding: const EdgeInsets.all(12),
-//                                child: Column(
-//                                  crossAxisAlignment: CrossAxisAlignment.start,
-//                                  children: <Widget>[
-//                                    Row(
-//                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                                      children: <Widget>[
-//                                        Container(
-//                                          padding: EdgeInsets.all(12),
-//                                          width: 120,
-//                                          decoration: BoxDecoration(
-//                                            color: Colors.white,
-//                                            borderRadius: BorderRadius.only(
-//                                              topLeft: Radius.circular(24),
-//                                              bottomRight: Radius.circular(24),
-//                                            ),
-//                                              boxShadow: [
-//                                                BoxShadow(
-//                                                    color: Colors.black.withOpacity(0.15),
-//                                                    blurRadius: 3,
-//                                                    spreadRadius: 2,
-//                                                    offset: Offset(4,4)
-//                                                ),
-//                                                BoxShadow(
-//                                                    color: Colors.black.withOpacity(0.05),
-//                                                    blurRadius: 1,
-//                                                    spreadRadius: 1,
-//                                                    offset: Offset(-2,-2)
-//                                                ),
-//                                              ]
-//                                          ),
-//                                          child: Center(child: Text("약국")),
-//                                        ),
-//                                        Column(
-//                                          crossAxisAlignment: CrossAxisAlignment.end,
-//                                          children: <Widget>[
-//                                            Text("입고시간: 12:11",style: TextStyle(
-//                                              fontSize: 12
-//                                            ),),
-//                                            Text("생성일: 2020/03/10 10:12:13",style: TextStyle(
-//                                                fontSize: 12
-//                                            ),)
-//                                          ],
-//                                        )
-//                                      ],
-//                                    ),
-//                                    SizedBox(height: 16,),
-//                                    Row(
-//                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                                      children: <Widget>[
-//                                        Expanded(
-//                                          flex:6,
-//                                          child: Column(
-//                                            crossAxisAlignment: CrossAxisAlignment.start,
-//                                            children: <Widget>[
-//                                              Text("판매처: 홍길동약국",style: TextStyle(
-//                                                fontSize: 16
-//                                              ),),
-//                                              Text("서울특별시 종로구 종로5가 1xx-x", style: TextStyle(
-//                                                fontSize: 12
-//                                              ),)
-//                                            ],
-//                                          ),
-//                                        ),
-//                                        Expanded(
-//                                          flex: 3,
-//                                          child: Container(
-//                                            height: 38,
-//                                            width: 38,
-//                                            decoration: BoxDecoration(
-//                                              color: Colors.lightGreen
-//                                            ),
-//                                            child: Center(
-//                                              child:Text("100개 이상",style: TextStyle(
-//                                                color: Colors.white
-//                                              ),),
-//                                            ),
-//                                          )
-//                                        ),
-//
-//                                      ],
-//                                    ),
-//
-//
-//                                  ],
-//                                ),
-//                              ),
-//                            ),
-//
-//                          ],
-//                        ),
-//
 
                       Container(
                         height: MediaQuery.of(context).size.height / 1.8,
@@ -2026,7 +1909,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   0 &&
                                               birthTextController.text.length ==
                                                   4) {
-                                            FocusScope.of(context).unfocus();
+//                                            FocusScope.of(context).unfocus();
 
                                             int num = int.parse(
                                                 birthTextController.text[3]);
@@ -2149,7 +2032,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
           ]),
 
-      floatingActionButton: pageIndex == 0
+      floatingActionButton: pageIndex == 1
           ? FloatingActionButton(
               onPressed: () {
                 if (appPublishFlag) {
@@ -2192,6 +2075,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             GestureDetector(
               onTap: () async {
+                analytics.logEvent(name: "onClickTouch");
                 _permissionGranted = await location.hasPermission();
                 if (_permissionGranted == PermissionStatus.DENIED) {
                   print("원래 권한이 디나인");
@@ -2219,13 +2103,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               },
               child: AvatarGlow(
-                startDelay: Duration(milliseconds: 1000),
+                startDelay: Duration(milliseconds: 500),
                 glowColor: Colors.red,
-                endRadius: 120.0,
-                duration: Duration(milliseconds: 2000),
+                endRadius: 140.0,
+                duration: Duration(milliseconds: 1000),
                 repeat: true,
                 showTwoGlows: true,
-                repeatPauseDuration: Duration(milliseconds: 100),
+                repeatPauseDuration: Duration(milliseconds: 80),
                 child: Material(
                   elevation: 8.0,
                   shape: CircleBorder(),
