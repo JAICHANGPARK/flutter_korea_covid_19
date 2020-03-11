@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Stores> stores;
   String userDay = "";
   String userBirth = "";
-  String defaultRange = "100";
+  String defaultRange = "1000";
 
   TextEditingController latTextController = TextEditingController();
   TextEditingController lngTextController = TextEditingController();
@@ -406,14 +406,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               });
             });
-          } else {
+          }
+          //아직 서비스 시작안할 떄
+          else {
             getSearchLog().then((r) {
               latTextController.text = r.lat;
               lngTextController.text = r.lng;
               print("저장된 거리값 : ${r.range}");
               if (r.range == "") {
                 defaultRange = r.range;
-                rangeTextController.text = "100";
+                rangeTextController.text = "1000";
               } else {
                 rangeTextController.text = r.range;
               }
@@ -526,7 +528,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 lngTextController.text = r.lng;
                 if (r.range == "") {
                   defaultRange = r.range;
-                  rangeTextController.text = "100";
+                  rangeTextController.text = "1000";
                 } else {
                   rangeTextController.text = r.range;
                 }
@@ -2252,7 +2254,7 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String title = "새로운 버전 출시";
-        String message = "지금보다 개선된 새로운 버전이 출시되었어요! 업데이트하시겠어요?";
+        String message = "지금보다 개선된 새로운 버전이 출시되었어요! 보다 나은 서비스 이용을 위해서 최신버전을 유지하는것을 추천드립니다. 업데이트하시겠어요?";
         String btnLabel = "지금 업데이트";
         String btnLabelCancel = "나중에";
         return new AlertDialog(
