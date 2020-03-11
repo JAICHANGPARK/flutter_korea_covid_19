@@ -43,6 +43,9 @@ dependencies:
   line_icons: any
 
   avatar_glow: any
+  sliding_up_panel: ^1.0.0
+
+  flutter_map: ^0.8.2
 
 
 dev_dependencies:
@@ -68,6 +71,7 @@ flutter:
   assets:
     - assets/
     - assets/icon/icons2/
+    - assets/files/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

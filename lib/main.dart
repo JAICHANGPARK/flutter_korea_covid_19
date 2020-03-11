@@ -19,6 +19,7 @@ import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/common/under_construct_page.dart';
 
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
+import 'package:fluttermasktest/ui/screen/map_web_view_test_page.dart';
 
 import 'package:fluttermasktest/utils/app_string.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,7 +58,8 @@ class MyApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
-      theme: ThemeData(
+      theme:
+      ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: Colors.teal,
           accentColor: Colors.red),
@@ -449,11 +451,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SimpleDialog(
                   contentPadding: EdgeInsets.all(16),
                   children: <Widget>[
-                    Text("1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
-                    Text("2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 왼쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
+                    Text(
+                        "1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
+                    Text(
+                        "2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 왼쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
                     Text("3. 위치정보는 주변 약국을 검색하기 위해 사용됩니다."),
-                    Text("4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다. 따뜻한 응원의 메시지를 전하면 어떨까요?"),
-                    Text("5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
+                    Text(
+                        "4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다. 따뜻한 응원의 메시지를 전하면 어떨까요?"),
+                    Text(
+                        "5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
                     SizedBox(
                       height: 16,
                     ),
@@ -762,6 +768,15 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(
           widget.title,
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => WebViewTest()));
+            },
+          )
+        ],
       ),
       body: IndexedStack(
         index: pageIndex,
@@ -810,9 +825,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             border: OutlineInputBorder(),
                                             labelText: "반경(m)",
                                             hintText: "100m(최대 5000m)"),
-                                        onChanged: (value) {
-
-                                        },
+                                        onChanged: (value) {},
                                       ),
                                     ),
                                     Expanded(
@@ -822,8 +835,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                           MaterialButton(
                                             child: Text('검색'),
                                             onPressed: () {
-                                              if (int.parse( rangeTextController.text) > 5000) {
-                                                rangeTextController.text = "5000";
+                                              if (int.parse(rangeTextController
+                                                      .text) >
+                                                  5000) {
+                                                rangeTextController.text =
+                                                    "5000";
                                               }
                                               FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
@@ -1143,13 +1159,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                             -2)),
                                                               ]),
                                                           child: Center(
-                                                              child: Text(
-                                                            typeText,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          )),
+                                                            child: Text(
+                                                                typeText,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodyText1.copyWith(
+                                                                  fontWeight: FontWeight.bold,
+                                                                )),
+                                                          ),
                                                         ),
                                                         Column(
                                                           crossAxisAlignment:
@@ -1657,9 +1675,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                         onClickStateText = "";
                                       });
                                     },
-                                    child: Text('다시시도',style: TextStyle(
-                                        color: Colors.white
-                                    ),),
+                                    child: Text(
+                                      '다시시도',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   )
                                 ],
                               )
@@ -2254,7 +2273,8 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String title = "새로운 버전 출시";
-        String message = "지금보다 개선된 새로운 버전이 출시되었어요! 보다 나은 서비스 이용을 위해서 최신버전을 유지하는것을 추천드립니다. 업데이트하시겠어요?";
+        String message =
+            "지금보다 개선된 새로운 버전이 출시되었어요! 보다 나은 서비스 이용을 위해서 최신버전을 유지하는것을 추천드립니다. 업데이트하시겠어요?";
         String btnLabel = "지금 업데이트";
         String btnLabelCancel = "나중에";
         return new AlertDialog(
