@@ -60,10 +60,7 @@ class MyApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          primaryColor: Colors.teal,
-          accentColor: Colors.red),
+      theme: ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.teal, accentColor: Colors.red),
       home: MyHomePage(title: '공적마스크 검색이'),
     );
   }
@@ -122,14 +119,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<StoreSaleResult> getMask(String lat, String lng, String range) async {
-    var url =
-        'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
+    var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=$lat&lng=$lng&m=$range';
     var response = await http.get(url);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
-      StoreSaleResult m = StoreSaleResult.fromJson(
-          json.decode(utf8.decode(response.bodyBytes)));
+      StoreSaleResult m = StoreSaleResult.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       return m;
     } else {
       throw Exception('접속량이 많아 다소 지연이 발생할 수 있습니다. 다시 시도해주세요. ');
@@ -137,10 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<String> getUserAddress(
-      String apiId, String apiKey, String lat, String lng) async {
-    var url =
-        'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${lng},${lat}&output=json';
+  Future<String> getUserAddress(String apiId, String apiKey, String lat, String lng) async {
+    var url = 'https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${lng},${lat}&output=json';
     var response = await http.get(
       url,
       headers: {
@@ -170,14 +163,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<StoreSaleResult> getMaskFromAddress(String address) async {
-    var url =
-        'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address=$address';
+    var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address=$address';
     var response = await http.get(url);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
-      StoreSaleResult m = StoreSaleResult.fromJson(
-          json.decode(utf8.decode(response.bodyBytes)));
+      StoreSaleResult m = StoreSaleResult.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       return m;
     } else {
       return null;
@@ -454,15 +445,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: SimpleDialog(
                   contentPadding: EdgeInsets.all(16),
                   children: <Widget>[
-                    Text(
-                        "1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
-                    Text(
-                        "2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 왼쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
+                    Text("1. 제공되는 공적마스크 판매 정보 및 재고 정보는 실제와 5분이상 지연된 정보로 그 이상 차이가 발생할 수 있습니다."),
+                    Text("2. 마스크 사용 지침 및 공적 마스크 관련 안내는 본 앱 왼쪽 상단 메뉴 및 [식약처 홈페이지]를 참고하세요."),
                     Text("3. 위치정보는 주변 약국을 검색하기 위해 사용됩니다."),
-                    Text(
-                        "4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다. 따뜻한 응원의 메시지를 전하면 어떨까요?"),
-                    Text(
-                        "5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
+                    Text("4. 밤낮으로 전국의 약사분들도 힘껏 지원하고 계십니다. 따뜻한 응원의 메시지를 전하면 어떨까요?"),
+                    Text("5. 위 내역을 확인하였고 동의하며 서비스를 이용하실 의향이 있으신 분만 동의하기를 눌러주세요 "),
                     SizedBox(
                       height: 16,
                     ),
@@ -591,8 +578,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => InformationWebViewPage(
-                          url:
-                              "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
+                          url: "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
                           title: "공적마스크 구매 안내",
                         )));
               },
@@ -612,8 +598,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => InformationWebViewPage(
-                            url:
-                                "https://www.mfds.go.kr/brd/m_99/view.do?seq=43955",
+                            url: "https://www.mfds.go.kr/brd/m_99/view.do?seq=43955",
                             title: "마스크 사용 권고사항",
                           )));
                 }),
@@ -773,13 +758,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(LineIcons.map), onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MapTest(userLocation: _locationData, storeItems: stores,)
-                )
-              );
-          },
+            icon: Icon(LineIcons.map),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => MapTest(
+                        userLocation: _locationData,
+                        storeItems: stores,
+                      )));
+            },
           )
 //          IconButton(
 //            icon: Icon(Icons.search),
@@ -817,25 +803,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget>[
                                               Text(
                                                 "검색 결과",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                style: Theme.of(context).textTheme.headline6.copyWith(
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                               ),
-                                              Text(
-                                                  "근처의 총 ${onClickStoreList.length}개 판매처를 찾았어요."),
+                                              Text("근처의 총 ${onClickStoreList.length}개 판매처를 찾았어요."),
                                             ],
                                           ),
                                           Spacer(),
@@ -864,10 +843,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         Color stockColor;
                                         Color stockTextColor;
                                         String stockText = "알수없음";
-                                        String remain =
-                                            onClickStoreList[index].remainStat;
-                                        String type =
-                                            onClickStoreList[index].type;
+                                        String remain = onClickStoreList[index].remainStat;
+                                        String type = onClickStoreList[index].type;
                                         String typeText;
                                         if (type == "01") {
                                           typeText = "약국";
@@ -902,19 +879,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                         }
 
                                         return Container(
-                                          margin: EdgeInsets.only(
-                                              bottom: 16, left: 8, right: 8),
+                                          margin: EdgeInsets.only(bottom: 16, left: 8, right: 8),
                                           decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(38),
-                                                bottomRight:
-                                                    Radius.circular(38),
+                                                bottomRight: Radius.circular(38),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.2),
+                                                    color: Colors.black.withOpacity(0.2),
                                                     blurRadius: 2,
                                                     spreadRadius: 1,
                                                     offset: Offset(2, 2))
@@ -922,93 +896,57 @@ class _MyHomePageState extends State<MyHomePage> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(16),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: <Widget>[
                                                     Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 8,
-                                                              horizontal: 24),
+                                                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                                                       decoration: BoxDecoration(
                                                           color: Colors.white,
-                                                          borderRadius:
-                                                              BorderRadius.only(
-                                                            topLeft:
-                                                                Radius.circular(
-                                                                    20),
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    20),
+                                                          borderRadius: BorderRadius.only(
+                                                            topLeft: Radius.circular(20),
+                                                            bottomRight: Radius.circular(20),
                                                           ),
                                                           boxShadow: [
                                                             BoxShadow(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.1),
+                                                                color: Colors.black.withOpacity(0.1),
                                                                 blurRadius: 3,
                                                                 spreadRadius: 2,
-                                                                offset: Offset(
-                                                                    2, 2)),
+                                                                offset: Offset(2, 2)),
                                                             BoxShadow(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.05),
+                                                                color: Colors.black.withOpacity(0.05),
                                                                 blurRadius: 1,
                                                                 spreadRadius: 1,
-                                                                offset: Offset(
-                                                                    -2, -2)),
+                                                                offset: Offset(-2, -2)),
                                                           ]),
                                                       child: Center(
                                                           child: Text(
                                                         typeText,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
+                                                        style: TextStyle(fontWeight: FontWeight.bold),
                                                       )),
                                                     ),
                                                     Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
                                                       children: <Widget>[
-                                                        onClickStoreList[index]
-                                                                    .stockAt !=
-                                                                null
+                                                        onClickStoreList[index].stockAt != null
                                                             ? Text(
                                                                 "입고시간: ${onClickStoreList[index].stockAt}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                style: TextStyle(fontSize: 12),
                                                               )
                                                             : Text(
                                                                 "입고시간: 정보없음",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                style: TextStyle(fontSize: 12),
                                                               ),
-                                                        onClickStoreList[index]
-                                                                    .createdAt !=
-                                                                null
+                                                        onClickStoreList[index].createdAt != null
                                                             ? Text(
                                                                 "생성일: ${onClickStoreList[index].createdAt}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                style: TextStyle(fontSize: 12),
                                                               )
                                                             : Text(
                                                                 "생성일: 정보없음",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                style: TextStyle(fontSize: 12),
                                                               )
                                                       ],
                                                     )
@@ -1018,53 +956,32 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   height: 16,
                                                 ),
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: <Widget>[
                                                     Expanded(
                                                       flex: 6,
                                                       child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: <Widget>[
-                                                          onClickStoreList[
-                                                                          index]
-                                                                      .name !=
-                                                                  null
+                                                          onClickStoreList[index].name != null
                                                               ? Text(
                                                                   "판매처: ${onClickStoreList[index].name}",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16),
+                                                                  style: TextStyle(fontSize: 16),
                                                                 )
                                                               : Text(
                                                                   "판매처: 정보없음",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16),
+                                                                  style: TextStyle(fontSize: 16),
                                                                 ),
                                                           Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    right: 48),
-                                                            child: onClickStoreList[
-                                                                            index]
-                                                                        .addr !=
-                                                                    null
+                                                            padding: const EdgeInsets.only(right: 48),
+                                                            child: onClickStoreList[index].addr != null
                                                                 ? SelectableText(
                                                                     "${onClickStoreList[index].addr}",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   )
                                                                 : Text(
                                                                     "주소 정보없음",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   ),
                                                           )
                                                         ],
@@ -1079,35 +996,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                 "geo:${stores[index].lat},${stores[index].lng}?q=${onClickStoreList[index].name}");
                                                           },
                                                           child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        16,
-                                                                    horizontal:
-                                                                        8),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .only(
-                                                                      bottomRight:
-                                                                          Radius.circular(
-                                                                              24),
-                                                                      topLeft: Radius
-                                                                          .circular(
-                                                                              24),
-                                                                    ),
-                                                                    color:
-                                                                        stockColor),
+                                                            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.only(
+                                                                  bottomRight: Radius.circular(24),
+                                                                  topLeft: Radius.circular(24),
+                                                                ),
+                                                                color: stockColor),
                                                             child: Center(
                                                               child: Text(
                                                                 stockText,
                                                                 style: TextStyle(
-                                                                    color:
-                                                                        stockTextColor,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
+                                                                    color: stockTextColor, fontWeight: FontWeight.bold),
                                                               ),
                                                             ),
                                                           ),
@@ -1167,22 +1067,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: <Widget>[
                                   Image.network(
                                     "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
-                                    height: MediaQuery.of(context).size.height /
-                                        3.5,
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
+                                    height: MediaQuery.of(context).size.height / 3.5,
+                                    width: MediaQuery.of(context).size.width / 2,
                                   ),
                                   GestureDetector(
                                     onTap: () async {
-                                      _permissionGranted =
-                                          await location.hasPermission();
-                                      if (_permissionGranted ==
-                                          PermissionStatus.DENIED) {
+                                      _permissionGranted = await location.hasPermission();
+                                      if (_permissionGranted == PermissionStatus.DENIED) {
                                         print("원래 권한이 디나인");
-                                        _permissionGranted =
-                                            await location.requestPermission();
-                                        if (_permissionGranted !=
-                                            PermissionStatus.GRANTED) {
+                                        _permissionGranted = await location.requestPermission();
+                                        if (_permissionGranted != PermissionStatus.GRANTED) {
                                           print("요청하고 위치 권한 허용 안함");
                                         } else {
                                           print("요청하고 위치권한 허용함.");
@@ -1190,35 +1084,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                       } else {
                                         print("위치 권한 허용 유저");
                                         if (_locationData != null) {
-                                          print(_locationData.latitude
-                                              .toString());
+                                          print(_locationData.latitude.toString());
                                           setState(() {
                                             onClickStart = true;
-                                            onClickStateText =
-                                                "주소 정보 가져오는 중...";
+                                            onClickStateText = "주소 정보 가져오는 중...";
                                           });
-                                          getUserAddress(
-                                                  mapApiId,
-                                                  mapApiKey,
-                                                  _locationData.latitude
-                                                      .toString(),
-                                                  _locationData.longitude
-                                                      .toString())
+                                          getUserAddress(mapApiId, mapApiKey, _locationData.latitude.toString(),
+                                                  _locationData.longitude.toString())
                                               .then((value) {
                                             print(value);
                                             if (value != "" && value != "404") {
                                               onClickUserAddressText = value;
                                               setState(() {
-                                                onClickStateText =
-                                                    "주소 정보 가져오기 성공!! 😍\n"
+                                                onClickStateText = "주소 정보 가져오기 성공!! 😍\n"
                                                     "$value 주변의 공적마스크 판매처를 검색중입니다..."
                                                     "잠시만 기다려주세요";
                                               });
-                                              getMaskFromAddress(value)
-                                                  .then((result) {
+                                              getMaskFromAddress(value).then((result) {
                                                 if (result != null) {
-                                                  List<Stores> tmpStores =
-                                                      result.stores;
+                                                  List<Stores> tmpStores = result.stores;
 
                                                   tmpStores.forEach((element) {
                                                     print(element.name);
@@ -1226,35 +1110,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
                                                   // 리스트 정렬
                                                   onClickStoreList.addAll(
-                                                      tmpStores
-                                                          .where((f) =>
-                                                              f.remainStat ==
-                                                              "plenty")
-                                                          .toList());
-                                                  onClickStoreList.addAll(
-                                                      tmpStores
-                                                          .where((f) =>
-                                                              f.remainStat ==
-                                                              "some")
-                                                          .toList());
-                                                  onClickStoreList.addAll(
-                                                      tmpStores
-                                                          .where((f) =>
-                                                              f.remainStat ==
-                                                              "few")
-                                                          .toList());
-                                                  onClickStoreList.addAll(
-                                                      tmpStores
-                                                          .where((f) =>
-                                                              f.remainStat ==
-                                                              "empty")
-                                                          .toList());
-                                                  onClickStoreList.addAll(
-                                                      tmpStores
-                                                          .where((f) =>
-                                                              f.remainStat ==
-                                                              null)
-                                                          .toList());
+                                                      tmpStores.where((f) => f.remainStat == "plenty").toList());
+                                                  onClickStoreList
+                                                      .addAll(tmpStores.where((f) => f.remainStat == "some").toList());
+                                                  onClickStoreList
+                                                      .addAll(tmpStores.where((f) => f.remainStat == "few").toList());
+                                                  onClickStoreList
+                                                      .addAll(tmpStores.where((f) => f.remainStat == "empty").toList());
+                                                  onClickStoreList
+                                                      .addAll(tmpStores.where((f) => f.remainStat == null).toList());
 
 //                                                  tmpStores.where((f) => f.stockAt =="empty").toList();
                                                   setState(() {
@@ -1262,30 +1126,24 @@ class _MyHomePageState extends State<MyHomePage> {
 //                                                        tmpStores;
                                                     onClickCompleted = true;
                                                     onClickStart = true;
-                                                    onClickStateText =
-                                                        "주변 ${result.count}곳의 장소를 찾았습니다.";
+                                                    onClickStateText = "주변 ${result.count}곳의 장소를 찾았습니다.";
                                                   });
                                                 }
-                                              }).timeout(Duration(seconds: 10),
-                                                      onTimeout: () {
+                                              }).timeout(Duration(seconds: 10), onTimeout: () {
                                                 showDialog(
                                                     context: context,
                                                     builder: (context) {
                                                       return AlertDialog(
                                                         title: Text('알림'),
-                                                        content: Text(
-                                                            "시간초과 (잠시후 다시 시도 해주시거나 인터넷 연결을 확인해주세요)"),
+                                                        content: Text("시간초과 (잠시후 다시 시도 해주시거나 인터넷 연결을 확인해주세요)"),
                                                         actions: <Widget>[
                                                           ButtonBar(
                                                             children: <Widget>[
                                                               FlatButton(
                                                                 onPressed: () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
+                                                                  Navigator.of(context).pop();
                                                                 },
-                                                                child:
-                                                                    Text("확인"),
+                                                                child: Text("확인"),
                                                               )
                                                             ],
                                                           )
@@ -1308,16 +1166,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   builder: (context) {
                                                     return AlertDialog(
                                                       title: Text('알림'),
-                                                      content: Text(
-                                                          "알수 없는 오류 (잠시후 다시 시도 해주시거나 인터넷 연결을 확인해주세요)"),
+                                                      content: Text("알수 없는 오류 (잠시후 다시 시도 해주시거나 인터넷 연결을 확인해주세요)"),
                                                       actions: <Widget>[
                                                         ButtonBar(
                                                           children: <Widget>[
                                                             FlatButton(
                                                               onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
+                                                                Navigator.of(context).pop();
                                                               },
                                                               child: Text("확인"),
                                                             )
@@ -1335,8 +1190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             }
                                           });
                                         } else {
-                                          _locationData =
-                                              await location.getLocation();
+                                          _locationData = await location.getLocation();
                                         }
                                       }
                                     },
@@ -1347,8 +1201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       duration: Duration(milliseconds: 2000),
                                       repeat: true,
                                       showTwoGlows: true,
-                                      repeatPauseDuration:
-                                          Duration(milliseconds: 100),
+                                      repeatPauseDuration: Duration(milliseconds: 100),
                                       child: Material(
                                         elevation: 8.0,
                                         shape: CircleBorder(),
@@ -1369,10 +1222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                   Text(
                                     "원클릭 검색하기",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline5
-                                        .copyWith(fontWeight: FontWeight.bold),
+                                    style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -1389,8 +1239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Card(
                         elevation: 6,
                         child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16, right: 16, top: 16, bottom: 16),
+                          padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -1410,10 +1259,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       flex: 8,
                                       child: TextField(
                                         autofocus: false,
-                                        inputFormatters: [
-                                          WhitelistingTextInputFormatter
-                                              .digitsOnly
-                                        ],
+                                        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                                         keyboardType: TextInputType.number,
                                         controller: rangeTextController,
                                         decoration: InputDecoration(
@@ -1431,59 +1277,38 @@ class _MyHomePageState extends State<MyHomePage> {
                                           MaterialButton(
                                             child: Text('검색'),
                                             onPressed: () {
-                                              if (int.parse(rangeTextController
-                                                      .text) >
-                                                  5000) {
-                                                rangeTextController.text =
-                                                    "5000";
+                                              if (int.parse(rangeTextController.text) > 5000) {
+                                                rangeTextController.text = "5000";
                                               }
 //                                              FocusScope.of(context).unfocus();
 //                              String lat = latTextController.text;
 //                              String lng = lngTextController.text;
-                                              String r =
-                                                  rangeTextController.text;
+                                              String r = rangeTextController.text;
 
                                               if (
 //                              lat.length > 0 &&
 //                                  lng.length > 0 &&
-                                                  _locationData != null &&
-                                                      r.length > 0) {
-                                                print(
-                                                    "latitude : ${_locationData.latitude.toString()}");
-                                                print(
-                                                    "longitude : ${_locationData.longitude.toString()}");
-                                                if (stores.length > 0 &&
-                                                    stores != null) {
+                                                  _locationData != null && r.length > 0) {
+                                                print("latitude : ${_locationData.latitude.toString()}");
+                                                print("longitude : ${_locationData.longitude.toString()}");
+                                                if (stores.length > 0 && stores != null) {
                                                   stores.clear();
-                                                  getMask(
-                                                          _locationData.latitude
-                                                              .toString(),
-                                                          _locationData
-                                                              .longitude
-                                                              .toString(),
-                                                          r)
-                                                      .timeout(
-                                                          Duration(seconds: 10),
-                                                          onTimeout: () {
+                                                  getMask(_locationData.latitude.toString(),
+                                                          _locationData.longitude.toString(), r)
+                                                      .timeout(Duration(seconds: 10), onTimeout: () {
                                                     showDialog(
                                                         context: context,
                                                         builder: (context) {
                                                           return AlertDialog(
                                                             title: Text("안내"),
-                                                            content: Text(
-                                                                "접속량이 많아 다소 지연이 발생할 수 있습니다. 다시 시도해주세요"),
+                                                            content: Text("접속량이 많아 다소 지연이 발생할 수 있습니다. 다시 시도해주세요"),
                                                             actions: <Widget>[
                                                               ButtonBar(
-                                                                children: <
-                                                                    Widget>[
+                                                                children: <Widget>[
                                                                   FlatButton(
-                                                                    child: Text(
-                                                                        "확인"),
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop();
+                                                                    child: Text("확인"),
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop();
                                                                     },
                                                                   )
                                                                 ],
@@ -1494,21 +1319,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     return null;
                                                   });
                                                 }
-                                                setSearchLog(
-                                                    _locationData.latitude
-                                                        .toString(),
-                                                    _locationData.longitude
-                                                        .toString(),
-                                                    r);
+                                                setSearchLog(_locationData.latitude.toString(),
+                                                    _locationData.longitude.toString(), r);
                                               }
                                               // 입력창이 비어있다면
                                               else {
                                                 showDialog(
                                                     context: context,
-                                                    builder: (context) =>
-                                                        AlertDialog(
-                                                          content: Text(
-                                                              "모든 조건을 입력해주세요"),
+                                                    builder: (context) => AlertDialog(
+                                                          content: Text("모든 조건을 입력해주세요"),
                                                         ));
                                               }
                                             },
@@ -1529,9 +1348,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: MediaQuery.of(context).size.width,
                         child: _locationData != null
                             ? FutureBuilder<StoreSaleResult>(
-                                future: getMask(
-                                    _locationData.latitude.toString(),
-                                    _locationData.longitude.toString(),
+                                future: getMask(_locationData.latitude.toString(), _locationData.longitude.toString(),
                                     rangeTextController.text),
                                 builder: (context, snapshot) {
 //                            if (snapshot.data == null)
@@ -1568,8 +1385,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             Color stockColor;
                                             Color stockTextColor;
                                             String stockText = "알수없음";
-                                            String remain =
-                                                stores[index].remainStat;
+                                            String remain = stores[index].remainStat;
                                             String type = stores[index].type;
                                             String typeText;
                                             if (type == "01") {
@@ -1605,135 +1421,75 @@ class _MyHomePageState extends State<MyHomePage> {
                                             }
 
                                             return Container(
-                                              margin: EdgeInsets.only(
-                                                  bottom: 16,
-                                                  left: 8,
-                                                  right: 8),
+                                              margin: EdgeInsets.only(bottom: 16, left: 8, right: 8),
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(38),
-                                                    bottomRight:
-                                                        Radius.circular(38),
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(38),
+                                                    bottomRight: Radius.circular(38),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.2),
+                                                        color: Colors.black.withOpacity(0.2),
                                                         blurRadius: 2,
                                                         spreadRadius: 1,
                                                         offset: Offset(2, 2))
                                                   ]),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(16),
+                                                padding: const EdgeInsets.all(16),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: <Widget>[
                                                     Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: <Widget>[
                                                         Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 8,
-                                                                  horizontal:
-                                                                      24),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .only(
-                                                                    topLeft: Radius
-                                                                        .circular(
-                                                                            20),
-                                                                    bottomRight:
-                                                                        Radius.circular(
-                                                                            20),
-                                                                  ),
-                                                                  boxShadow: [
+                                                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                                                          decoration: BoxDecoration(
+                                                              color: Colors.white,
+                                                              borderRadius: BorderRadius.only(
+                                                                topLeft: Radius.circular(20),
+                                                                bottomRight: Radius.circular(20),
+                                                              ),
+                                                              boxShadow: [
                                                                 BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    blurRadius:
-                                                                        3,
-                                                                    spreadRadius:
-                                                                        2,
-                                                                    offset:
-                                                                        Offset(
-                                                                            2,
-                                                                            2)),
+                                                                    color: Colors.black.withOpacity(0.1),
+                                                                    blurRadius: 3,
+                                                                    spreadRadius: 2,
+                                                                    offset: Offset(2, 2)),
                                                                 BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.05),
-                                                                    blurRadius:
-                                                                        1,
-                                                                    spreadRadius:
-                                                                        1,
-                                                                    offset:
-                                                                        Offset(
-                                                                            -2,
-                                                                            -2)),
+                                                                    color: Colors.black.withOpacity(0.05),
+                                                                    blurRadius: 1,
+                                                                    spreadRadius: 1,
+                                                                    offset: Offset(-2, -2)),
                                                               ]),
                                                           child: Center(
-                                                            child: Text(
-                                                                typeText,
-                                                                style: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .bodyText1
-                                                                    .copyWith(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
+                                                            child: Text(typeText,
+                                                                style: Theme.of(context).textTheme.bodyText1.copyWith(
+                                                                      fontWeight: FontWeight.bold,
                                                                     )),
                                                           ),
                                                         ),
                                                         Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .end,
+                                                          crossAxisAlignment: CrossAxisAlignment.end,
                                                           children: <Widget>[
-                                                            stores[index]
-                                                                        .stockAt !=
-                                                                    null
+                                                            stores[index].stockAt != null
                                                                 ? Text(
                                                                     "입고시간: ${stores[index].stockAt}",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   )
                                                                 : Text(
                                                                     "입고시간: 정보없음",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   ),
-                                                            stores[index]
-                                                                        .createdAt !=
-                                                                    null
+                                                            stores[index].createdAt != null
                                                                 ? Text(
                                                                     "생성일: ${stores[index].createdAt}",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   )
                                                                 : Text(
                                                                     "생성일: 정보없음",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
+                                                                    style: TextStyle(fontSize: 12),
                                                                   )
                                                           ],
                                                         )
@@ -1743,52 +1499,32 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       height: 16,
                                                     ),
                                                     Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: <Widget>[
                                                         Expanded(
                                                           flex: 6,
                                                           child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: <Widget>[
-                                                              stores[index]
-                                                                          .name !=
-                                                                      null
+                                                              stores[index].name != null
                                                                   ? Text(
                                                                       "판매처: ${stores[index].name}",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              16),
+                                                                      style: TextStyle(fontSize: 16),
                                                                     )
                                                                   : Text(
                                                                       "판매처: 정보없음",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              16),
+                                                                      style: TextStyle(fontSize: 16),
                                                                     ),
                                                               Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        right:
-                                                                            48),
-                                                                child: stores[index]
-                                                                            .addr !=
-                                                                        null
+                                                                padding: const EdgeInsets.only(right: 48),
+                                                                child: stores[index].addr != null
                                                                     ? SelectableText(
                                                                         "${stores[index].addr}",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                12),
+                                                                        style: TextStyle(fontSize: 12),
                                                                       )
                                                                     : Text(
                                                                         "주소 정보없음",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                12),
+                                                                        style: TextStyle(fontSize: 12),
                                                                       ),
                                                               )
                                                             ],
@@ -1797,33 +1533,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         Expanded(
                                                             flex: 3,
                                                             child: Container(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          16,
-                                                                      horizontal:
-                                                                          8),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius
-                                                                              .only(
-                                                                        bottomRight:
-                                                                            Radius.circular(24),
-                                                                        topLeft:
-                                                                            Radius.circular(24),
-                                                                      ),
-                                                                      color:
-                                                                          stockColor),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.only(
+                                                                    bottomRight: Radius.circular(24),
+                                                                    topLeft: Radius.circular(24),
+                                                                  ),
+                                                                  color: stockColor),
                                                               child: Center(
                                                                 child: Text(
                                                                   stockText,
                                                                   style: TextStyle(
-                                                                      color:
-                                                                          stockTextColor,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
+                                                                      color: stockTextColor,
+                                                                      fontWeight: FontWeight.bold),
                                                                 ),
                                                               ),
                                                             )),
@@ -1841,10 +1564,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     //응답받은 결과의 길이가 0이 아닐떄
                                     else {
                                       return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: <Widget>[
                                           CircularProgressIndicator(),
                                           Text("잠시만 기다려주세요..."),
@@ -1855,14 +1576,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     }
                                   } else {
                                     return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        CircularProgressIndicator(),
-                                        Text("정보요청중...")
-                                      ],
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[CircularProgressIndicator(), Text("정보요청중...")],
                                     );
                                   }
                                 },
@@ -1949,8 +1665,7 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.network(
-                    "https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
+                Image.network("https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
                 Center(
                   child: Text("개발중...업데이트 예정"),
                 ),
@@ -1985,8 +1700,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               width: MediaQuery.of(context).size.width,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Text(
                                     "출생연도를 입력해주세요",
@@ -2003,9 +1717,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     autofocus: false,
                                     maxLength: 4,
                                     controller: birthTextController,
-                                    inputFormatters: [
-                                      WhitelistingTextInputFormatter.digitsOnly
-                                    ],
+                                    inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                                     decoration: InputDecoration(
                                         border: OutlineInputBorder(),
                                         labelText: "출생연도 4자리",
@@ -2017,14 +1729,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       MaterialButton(
                                         color: Colors.teal,
                                         onPressed: () {
-                                          if (birthTextController.text.length >
-                                                  0 &&
-                                              birthTextController.text.length ==
-                                                  4) {
+                                          if (birthTextController.text.length > 0 &&
+                                              birthTextController.text.length == 4) {
 //                                            FocusScope.of(context).unfocus();
 
-                                            int num = int.parse(
-                                                birthTextController.text[3]);
+                                            int num = int.parse(birthTextController.text[3]);
 
                                             if (num == 1 || num == 6) {
                                               userDay = "월";
@@ -2038,18 +1747,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                               userDay = "금";
                                             }
 
-                                            setUserBirth(
-                                                birthTextController.text,
-                                                userDay);
+                                            setUserBirth(birthTextController.text, userDay);
 
                                             setState(() {});
                                           } else {
                                             showDialog(
                                                 context: context,
-                                                builder: (context) =>
-                                                    AlertDialog(
-                                                      content: Text(
-                                                          "4자리 출생연도를 입력해주세요"),
+                                                builder: (context) => AlertDialog(
+                                                      content: Text("4자리 출생연도를 입력해주세요"),
                                                     ));
                                           }
                                         },
@@ -2133,14 +1838,10 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           type: BottomNavigationBarType.fixed,
           items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.plus_one), title: Text("원클릭검색")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.my_location), title: Text("내위치주변")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.list), title: Text("검색기록")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
+            BottomNavigationBarItem(icon: Icon(Icons.plus_one), title: Text("원클릭검색")),
+            BottomNavigationBarItem(icon: Icon(Icons.my_location), title: Text("내위치주변")),
+            BottomNavigationBarItem(icon: Icon(Icons.list), title: Text("검색기록")),
+            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
           ]),
 
       floatingActionButton: pageIndex == 1
@@ -2184,14 +1885,12 @@ class _MyHomePageState extends State<MyHomePage> {
               "https://assets-ouch.icons8.com/thumb/918/5a740b73-921a-448e-a681-a03c20dcea66.png",
               height: MediaQuery.of(context).size.height / 3,
               width: MediaQuery.of(context).size.width / 2,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent loadingProgress) {
+              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
                 if (loadingProgress == null) return child;
                 return Center(
                   child: CircularProgressIndicator(
                     value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes
+                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
                         : null,
                   ),
                 );
@@ -2217,10 +1916,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onClickProcessState = OnClickProcessState.start;
                     });
                     getUserAddress(
-                        mapApiId,
-                        mapApiKey,
-                        _locationData.latitude.toString(),
-                        _locationData.longitude.toString());
+                        mapApiId, mapApiKey, _locationData.latitude.toString(), _locationData.longitude.toString());
                   } else {
                     _locationData = await location.getLocation();
                   }
@@ -2254,10 +1950,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               "원클릭 검색하기",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  .copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         );
@@ -2285,8 +1978,7 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String title = "새로운 버전 출시";
-        String message =
-            "지금보다 개선된 새로운 버전이 출시되었어요! 보다 나은 서비스 이용을 위해서 최신버전을 유지하는것을 추천드립니다. 업데이트하시겠어요?";
+        String message = "지금보다 개선된 새로운 버전이 출시되었어요! 보다 나은 서비스 이용을 위해서 최신버전을 유지하는것을 추천드립니다. 업데이트하시겠어요?";
         String btnLabel = "지금 업데이트";
         String btnLabelCancel = "나중에";
         return new AlertDialog(
