@@ -47,3 +47,4 @@ android/app/google-services.json
 assets/api_key.json
 lib/model/api_keys.dart
 lib/ui/screen/map_web_view_test_page.dart
+lib/ui/screen/test/map_test.dart

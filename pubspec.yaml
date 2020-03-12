@@ -45,7 +45,7 @@ dependencies:
   avatar_glow: any
   sliding_up_panel: ^1.0.0
 
-  flutter_map: ^0.8.2
+  flutter_map: any
 
 
 dev_dependencies:
