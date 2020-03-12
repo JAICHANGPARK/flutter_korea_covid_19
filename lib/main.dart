@@ -760,11 +760,35 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(LineIcons.map),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => MapTest(
-                        userLocation: _locationData,
-                        storeItems: stores,
-                      )));
+              if (pageIndex == 0) {
+                if (onClickStoreList != null) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MapTest(
+                            userLocation: _locationData,
+                            storeItems: onClickStoreList,
+                          )));
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MapTest(
+                            userLocation: _locationData,
+                            storeItems: [],
+                          )));
+                }
+              } else if (pageIndex == 1) {
+                if (stores != null) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MapTest(
+                            userLocation: _locationData,
+                            storeItems: stores,
+                          )));
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MapTest(
+                            userLocation: _locationData,
+                            storeItems: [],
+                          )));
+                }
+              }
             },
           )
 //          IconButton(
@@ -787,7 +811,7 @@ class _MyHomePageState extends State<MyHomePage> {
           !appPublishFlag
               ? UnderConstructPage()
               :
-              // 원클릭 검색 두번째 페이지
+              // 원클릭 검색 원래 // 두번째 페이지
               Container(
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
@@ -993,7 +1017,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           onTap: () {
                                                             analytics.logEvent(name: "ClickToMap");
                                                             _launchURL(
-                                                                "geo:${stores[index].lat},${stores[index].lng}?q=${onClickStoreList[index].name}");
+                                                                "geo:${onClickStoreList[index].lat},${onClickStoreList[index].lng}?q=${onClickStoreList[index].name}");
                                                           },
                                                           child: Container(
                                                             padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -1559,8 +1583,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                           },
                                         ),
                                       );
+                                    } else if (stores.length == 0) {
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Image.network(
+                                            "https://assets-ouch.icons8.com/thumb/100/17018717-ad19-4c5b-9a9b-f31a1270ed1f.png",
+                                            height: MediaQuery.of(context).size.height / 3.8,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "검색결과 근처에 판패처가 없어요. \n검색 반경을 늘려보거나 왼쪽 상단의 지도를 이용해보세요.",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          )
+                                        ],
+                                      );
                                     }
-
                                     //응답받은 결과의 길이가 0이 아닐떄
                                     else {
                                       return Column(
@@ -1844,34 +1885,50 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
           ]),
 
-      floatingActionButton: pageIndex == 1
-          ? FloatingActionButton(
-              onPressed: () {
-                analytics.logEvent(name: "userRefresh");
-                if (appPublishFlag) {
-                  setState(() {
-                    if (stores != null) {
-                      stores.clear();
-                    }
-                  });
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            content: Text("현재 이용할 수 없습니다."),
-                          ));
-                }
+      floatingActionButton: _buildFloatingActionButton(pageIndex)
+      // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildFloatingActionButton(int index) {
+    if (index == 0) {
+      return FloatingActionButton(
+        child: Icon(Icons.map),
+        onPressed: () {
+
+
+        },
+      );
+    }
+    else if(index ==1){
+      return FloatingActionButton(
+        onPressed: () {
+          analytics.logEvent(name: "userRefresh");
+          if (appPublishFlag) {
+            setState(() {
+              if (stores != null) {
+                stores.clear();
+              }
+            });
+          } else {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  content: Text("현재 이용할 수 없습니다."),
+                ));
+          }
 //                setState(() {
 //                  if (stores != null) {
 //                    stores.clear();
 //                  }
 //                });
-              },
-              tooltip: 'Refresh',
-              child: Icon(Icons.refresh),
-            )
-          : null, // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        },
+        tooltip: 'Refresh',
+        child: Icon(Icons.refresh),
+      );
+    }else{
+      return null;
+    }
   }
 
   _buildOnClickWidget(OnClickProcessState onClickProcessState) {
