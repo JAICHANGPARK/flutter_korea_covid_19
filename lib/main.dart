@@ -1892,40 +1892,59 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildFloatingActionButton(int index) {
     if (index == 0) {
-      return FloatingActionButton(
-        child: Icon(Icons.map),
-        onPressed: () {
+      if(onClickStoreList.length > 0){
+        return FloatingActionButton(
+          child: Icon(Icons.map),
+          onPressed: () {
+            if (onClickStoreList != null) {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => MapTest(
+                    userLocation: _locationData,
+                    storeItems: onClickStoreList,
+                  )));
+            } else {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => MapTest(
+                    userLocation: _locationData,
+                    storeItems: [],
+                  )));
+            }
 
+          },
+        );
+      }else{
+        return null;
+      }
 
-        },
-      );
     }
     else if(index ==1){
-      return FloatingActionButton(
-        onPressed: () {
-          analytics.logEvent(name: "userRefresh");
-          if (appPublishFlag) {
-            setState(() {
-              if (stores != null) {
-                stores.clear();
-              }
-            });
-          } else {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  content: Text("현재 이용할 수 없습니다."),
-                ));
-          }
+
+        return FloatingActionButton(
+          onPressed: () {
+            analytics.logEvent(name: "userRefresh");
+            if (appPublishFlag) {
+              setState(() {
+                if (stores != null) {
+                  stores.clear();
+                }
+              });
+            } else {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: Text("현재 이용할 수 없습니다."),
+                  ));
+            }
 //                setState(() {
 //                  if (stores != null) {
 //                    stores.clear();
 //                  }
 //                });
-        },
-        tooltip: 'Refresh',
-        child: Icon(Icons.refresh),
-      );
+          },
+          tooltip: 'Refresh',
+          child: Icon(Icons.refresh),
+        );
+
     }else{
       return null;
     }

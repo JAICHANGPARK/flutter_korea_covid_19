@@ -17,7 +17,7 @@ class UnderConstructPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
-              child: Text("개발중...추후 예정"),
+              child: Text("개발 중...."),
             ),
           ),
         ],
