@@ -1066,7 +1066,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           onTap: () {
                                                             analytics.logEvent(name: "ClickToMap");
                                                             _launchURL(
-                                                                "geo:${stores[index].lat},${stores[index].lng}?q=${stores[index].name}");
+                                                                "geo:${stores[index].lat},${stores[index].lng}?q=${onClickStoreList[index].name}");
                                                           },
                                                           child: Container(
                                                             padding: EdgeInsets
