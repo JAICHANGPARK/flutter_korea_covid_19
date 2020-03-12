@@ -20,6 +20,7 @@ import 'package:fluttermasktest/ui/common/under_construct_page.dart';
 
 import 'package:fluttermasktest/ui/screen/info_web_view_page.dart';
 import 'package:fluttermasktest/ui/screen/map_web_view_test_page.dart';
+import 'package:fluttermasktest/ui/screen/test/map_test.dart';
 import 'package:fluttermasktest/ui/screen/test/test_detail_page.dart';
 
 import 'package:fluttermasktest/utils/app_string.dart';
@@ -771,6 +772,15 @@ class _MyHomePageState extends State<MyHomePage> {
           widget.title,
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(LineIcons.map), onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MapTest(userLocation: _locationData, storeItems: stores,)
+                )
+              );
+          },
+          )
 //          IconButton(
 //            icon: Icon(Icons.search),
 //            onPressed: () {
