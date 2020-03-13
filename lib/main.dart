@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -351,6 +352,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     // TODO: implement initState
+    analytics.setCurrentScreen(screenName: "MainPage");
     firebaseCloudMessagingListeners();
 
     getApiKeys('assets/api_key.json').then((value) {
@@ -766,12 +768,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => MapTest(
                               userLocation: _locationData,
                               storeItems: onClickStoreList,
+                              analytics: analytics,
                             )));
                   } else {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => MapTest(
                               userLocation: _locationData,
                               storeItems: [],
+                              analytics: analytics,
                             )));
                   }
                 } else if (pageIndex == 1) {
@@ -780,12 +784,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => MapTest(
                               userLocation: _locationData,
                               storeItems: stores,
+                              analytics: analytics,
                             )));
                   } else {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => MapTest(
                               userLocation: _locationData,
                               storeItems: [],
+                              analytics: analytics,
                             )));
                   }
                 }
@@ -1903,20 +1909,30 @@ class _MyHomePageState extends State<MyHomePage> {
     if (index == 0) {
       if (onClickStoreList.length > 0) {
         return FloatingActionButton(
+          tooltip: "open map",
           child: Icon(Icons.map),
-          onPressed: () {
+          onPressed: () async {
             analytics.logEvent(name: "ClickToMap");
             if (onClickStoreList != null) {
-              Navigator.of(context).push(MaterialPageRoute(
+              List<Stores> tmp = onClickStoreList;
+              onClickStoreList = await Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MapTest(
                         userLocation: _locationData,
                         storeItems: onClickStoreList,
+                        analytics: analytics,
                       )));
+              print(onClickStoreList.length);
+              print("returned");
+              if (onClickStoreList.length == 0) {
+                onClickStoreList = tmp;
+              }
+              setState(() {});
             } else {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MapTest(
                         userLocation: _locationData,
                         storeItems: [],
+                        analytics: analytics,
                       )));
             }
           },
@@ -2095,6 +2111,22 @@ class _MyHomePageState extends State<MyHomePage> {
       throw 'Could not launch';
     }
   }
+  @override
+  void didUpdateWidget(MyHomePage oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    print("didUpdateWidget!!!!");
+  }
+
+
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+  _fetchData() {
+    return this._memoizer.runOnce(() async {
+      await Future.delayed(Duration(seconds: 2));
+      return 'REMOTE DATA';
+    });
+  }
+
 }
 
 class CustomSearchDelegate extends SearchDelegate {
@@ -2146,4 +2178,6 @@ class CustomSearchDelegate extends SearchDelegate {
     // TODO: implement buildSuggestions
     return Column();
   }
+
+
 }

@@ -49,6 +49,8 @@ dependencies:
   flutter_map_marker_cluster: any
 
   share: any
+  intl: ^0.16.1
+  async: ^2.4.0
 
 
 dev_dependencies:
