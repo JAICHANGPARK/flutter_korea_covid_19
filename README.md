@@ -1,6 +1,11 @@
 # [마스크5부제 대응] 공적마스크 검색이
 
+### Playstore
 https://play.google.com/store/apps/details?id=flutter.dreamwalker.com.fluttermasktest
+
+### One Store (KR)
+
+https://onestore.co.kr/userpoc/apps/view?pid=0000746817
 
 ## Getting Started
 
