@@ -1921,15 +1921,24 @@ class _MyHomePageState extends State<MyHomePage> {
                         storeItems: onClickStoreList,
                         analytics: analytics,
                       )));
-              print(onClickStoreList.length);
+
               print("returned");
-              if (onClickStoreList.length == 0) {
+              if (onClickStoreList == null) {
                 setState(() {
                   onClickCompleted = false;
                   onClickStart = false;
 //                  onClickStoreList = tmp;
                 });
+              } else {
+                if (onClickStoreList.length == 0) {
+                  setState(() {
+                    onClickCompleted = false;
+                    onClickStart = false;
+//                  onClickStoreList = tmp;
+                  });
+                }
               }
+
 //              setState(() {});
             } else {
               Navigator.of(context).push(MaterialPageRoute(
