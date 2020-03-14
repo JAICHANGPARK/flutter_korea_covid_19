@@ -1926,6 +1926,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (onClickStoreList.length == 0) {
                 setState(() {
                   onClickCompleted = false;
+                  onClickStart = false;
 //                  onClickStoreList = tmp;
                 });
               }
