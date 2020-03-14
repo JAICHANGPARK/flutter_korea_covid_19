@@ -1924,9 +1924,12 @@ class _MyHomePageState extends State<MyHomePage> {
               print(onClickStoreList.length);
               print("returned");
               if (onClickStoreList.length == 0) {
-                onClickStoreList = tmp;
+                setState(() {
+                  onClickCompleted = false;
+//                  onClickStoreList = tmp;
+                });
               }
-              setState(() {});
+//              setState(() {});
             } else {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MapTest(
@@ -2111,6 +2114,7 @@ class _MyHomePageState extends State<MyHomePage> {
       throw 'Could not launch';
     }
   }
+
   @override
   void didUpdateWidget(MyHomePage oldWidget) {
     // TODO: implement didUpdateWidget
@@ -2118,15 +2122,14 @@ class _MyHomePageState extends State<MyHomePage> {
     print("didUpdateWidget!!!!");
   }
 
-
   final AsyncMemoizer _memoizer = AsyncMemoizer();
+
   _fetchData() {
     return this._memoizer.runOnce(() async {
       await Future.delayed(Duration(seconds: 2));
       return 'REMOTE DATA';
     });
   }
-
 }
 
 class CustomSearchDelegate extends SearchDelegate {
@@ -2178,6 +2181,4 @@ class CustomSearchDelegate extends SearchDelegate {
     // TODO: implement buildSuggestions
     return Column();
   }
-
-
 }
