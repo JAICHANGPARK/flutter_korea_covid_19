@@ -62,6 +62,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
       theme: ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.teal, accentColor: Colors.red),
+      darkTheme: ThemeData.dark().copyWith(
+        textTheme: TextTheme(
+
+        )
+      ),
       home: MyHomePage(title: '공적마스크 검색이'),
     );
   }
@@ -563,6 +568,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightnessValue = MediaQuery.of(context).platformBrightness;
+    bool isDark = brightnessValue == Brightness.dark;
+    print("다크모드? $isDark");
     return Scaffold(
         drawer: Drawer(
           child: ListView(
@@ -746,7 +754,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 onTap: () {
                   setState(() {
-                    pageIndex = 3;
+                    pageIndex = 2;
                   });
                   Navigator.of(context).pop();
                 },
@@ -821,7 +829,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                     height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: onClickCompleted
@@ -901,7 +909,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           } else if (remain == "empty") {
                                             stockColor = Colors.grey[300];
                                             stockText = "재고없음😢";
-                                            stockTextColor = Colors.white;
+                                            stockTextColor = Colors.black;
                                           } else if (remain == "break") {
                                             stockColor = Colors.grey[300];
                                             stockText = "판매중지 🙅‍♂️";
@@ -915,7 +923,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           return Container(
                                             margin: EdgeInsets.only(bottom: 16, left: 8, right: 8),
                                             decoration: BoxDecoration(
-                                                color: Colors.white,
+                                                color: Theme.of(context).cardColor,
                                                 borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(38),
                                                   bottomRight: Radius.circular(38),
@@ -938,7 +946,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       Container(
                                                         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                                                         decoration: BoxDecoration(
-                                                            color: Colors.white,
+                                                            color: Theme.of(context).cardColor,
                                                             borderRadius: BorderRadius.only(
                                                               topLeft: Radius.circular(20),
                                                               bottomRight: Radius.circular(20),
@@ -1231,22 +1239,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                         }
                                       },
                                       child: AvatarGlow(
-                                        startDelay: Duration(milliseconds: 1000),
-                                        glowColor: Colors.red,
+                                        startDelay: Duration(milliseconds: 500),
+                                        glowColor: isDark? Theme.of(context).accentColor:Colors.red,
                                         endRadius: 120.0,
-                                        duration: Duration(milliseconds: 2000),
+                                        duration: Duration(milliseconds: 1200),
                                         repeat: true,
                                         showTwoGlows: true,
-                                        repeatPauseDuration: Duration(milliseconds: 100),
+                                        repeatPauseDuration: Duration(milliseconds: 50),
                                         child: Material(
                                           elevation: 8.0,
                                           shape: CircleBorder(),
                                           child: CircleAvatar(
-                                            backgroundColor: Colors.grey[100],
+                                            backgroundColor: Theme.of(context).cardColor,
                                             child: Icon(
                                               LineIcons.play,
                                               size: 58,
-                                              color: Colors.red,
+                                              color: isDark? Theme.of(context).accentColor:Colors.red,
                                             ),
                                             radius: 60.0,
                                           ),
@@ -1450,7 +1458,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               } else if (remain == "empty") {
                                                 stockColor = Colors.grey[300];
                                                 stockText = "재고없음😢";
-                                                stockTextColor = Colors.white;
+                                                stockTextColor = Colors.black;
                                               } else if (remain == "break") {
                                                 stockColor = Colors.grey[300];
                                                 stockText = "판매중지 🙅‍♂️";
@@ -1464,7 +1472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               return Container(
                                                 margin: EdgeInsets.only(bottom: 16, left: 8, right: 8),
                                                 decoration: BoxDecoration(
-                                                    color: Colors.white,
+                                                    color: Theme.of(context).cardColor,
                                                     borderRadius: BorderRadius.only(
                                                       topLeft: Radius.circular(38),
                                                       bottomRight: Radius.circular(38),
@@ -1487,7 +1495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           Container(
                                                             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                                                             decoration: BoxDecoration(
-                                                                color: Colors.white,
+                                                                color: Theme.of(context).cardColor,
                                                                 borderRadius: BorderRadius.only(
                                                                   topLeft: Radius.circular(20),
                                                                   bottomRight: Radius.circular(20),
@@ -1714,22 +1722,22 @@ class _MyHomePageState extends State<MyHomePage> {
 //            ),
 //          ),
 
-            //세번째 페이지
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.network("https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
-                  Center(
-                    child: Text("개발중...업데이트 예정"),
-                  ),
-                ],
-              ),
-            ),
+//            //세번째 페이지
+//            Container(
+//              height: MediaQuery.of(context).size.height,
+//              width: MediaQuery.of(context).size.width,
+//              color: Theme.of(context).scaffoldBackgroundColor,
+//              child: Column(
+//                crossAxisAlignment: CrossAxisAlignment.center,
+//                mainAxisAlignment: MainAxisAlignment.center,
+//                children: <Widget>[
+//                  Image.network("https://assets-ouch.icons8.com/thumb/866/7387d6d9-81eb-405c-854f-d73b00b8e789.png"),
+//                  Center(
+//                    child: Text("개발중...업데이트 예정"),
+//                  ),
+//                ],
+//              ),
+//            ),
             SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -1879,7 +1887,7 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomNavigationBar: BottomNavigationBar(
             currentIndex: pageIndex,
             onTap: (newValue) {
-              if (newValue == 3) {
+              if (newValue == 2) {
                 getUserBirth().then((value) {
                   birthTextController.text = value;
                   getUserDay().then((v) {
@@ -1897,7 +1905,7 @@ class _MyHomePageState extends State<MyHomePage> {
             items: [
               BottomNavigationBarItem(icon: Icon(Icons.plus_one), title: Text("원클릭검색")),
               BottomNavigationBarItem(icon: Icon(Icons.my_location), title: Text("내위치주변")),
-              BottomNavigationBarItem(icon: Icon(Icons.list), title: Text("검색기록")),
+//              BottomNavigationBarItem(icon: Icon(Icons.list), title: Text("검색기록")),
               BottomNavigationBarItem(icon: Icon(Icons.calendar_today), title: Text("구매 요일 확인")),
             ]),
         floatingActionButton: _buildFloatingActionButton(pageIndex)

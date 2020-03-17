@@ -277,6 +277,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _body(){
     return FlutterMap(
+
+      mapController: MapController(),
+
       options: MapOptions(
         center: LatLng(37.5437, 127.1425),
         zoom: 13,
