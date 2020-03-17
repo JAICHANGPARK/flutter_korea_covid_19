@@ -16,6 +16,7 @@ import 'package:fluttermasktest/model/naver_reversegeocode.dart' as ng;
 import 'package:fluttermasktest/model/recent.dart';
 
 import 'package:fluttermasktest/model/store_sale_result.dart';
+import 'package:fluttermasktest/provider/theme_provider.dart';
 import 'package:fluttermasktest/ui/common/notification_item.dart';
 import 'package:fluttermasktest/ui/common/under_construct_page.dart';
 
@@ -32,6 +33,7 @@ import 'package:http/http.dart' as http;
 import 'package:line_icons/line_icons.dart';
 import 'package:location/location.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +50,13 @@ enum OnClickProcessState {
 }
 
 void main() async {
-  runApp(MyApp());
+
+  final Brightness brightnessValue = MediaQuery.of(context).platformBrightness;
+  bool isDark = brightnessValue == Brightness.dark;
+  runApp(ChangeNotifierProvider(
+    create: (_) => ThemeProvider(isLightTheme: true),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -62,11 +70,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
       theme: ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.teal, accentColor: Colors.red),
-      darkTheme: ThemeData.dark().copyWith(
-        textTheme: TextTheme(
-
-        )
-      ),
+      darkTheme: ThemeData.dark().copyWith(textTheme: TextTheme()),
       home: MyHomePage(title: '공적마스크 검색이'),
     );
   }
@@ -1240,7 +1244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       },
                                       child: AvatarGlow(
                                         startDelay: Duration(milliseconds: 500),
-                                        glowColor: isDark? Theme.of(context).accentColor:Colors.red,
+                                        glowColor: isDark ? Theme.of(context).accentColor : Colors.red,
                                         endRadius: 120.0,
                                         duration: Duration(milliseconds: 1200),
                                         repeat: true,
@@ -1254,7 +1258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             child: Icon(
                                               LineIcons.play,
                                               size: 58,
-                                              color: isDark? Theme.of(context).accentColor:Colors.red,
+                                              color: isDark ? Theme.of(context).accentColor : Colors.red,
                                             ),
                                             radius: 60.0,
                                           ),
