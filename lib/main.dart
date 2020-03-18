@@ -51,25 +51,29 @@ enum OnClickProcessState {
 
 void main() async {
 
-  final Brightness brightnessValue = MediaQuery.of(context).platformBrightness;
-  bool isDark = brightnessValue == Brightness.dark;
-  runApp(ChangeNotifierProvider(
-    create: (_) => ThemeProvider(isLightTheme: true),
-    child: MyApp(),
-  ));
+//  runApp(ChangeNotifierProvider(
+//    create: (_) {
+//      return ThemeProvider(isLightTheme: true);
+//    } ,
+//    child: MyApp(),
+//  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+//    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: analytics),
       ],
       debugShowCheckedModeBanner: false,
       title: '공적마스크 검색이',
-      theme: ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.teal, accentColor: Colors.red),
+      theme: ThemeData(primarySwatch: Colors.blue,
+          primaryColor: Colors.teal,
+          accentColor: Colors.red),
       darkTheme: ThemeData.dark().copyWith(textTheme: TextTheme()),
       home: MyHomePage(title: '공적마스크 검색이'),
     );
@@ -120,6 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String mapApiId = "";
   String mapApiKey = "";
+
+  bool darkModeSwitch = false;
 
   Future<ApiKeys> getApiKeys(String path) async {
     String data = await DefaultAssetBundle.of(context).loadString(path);
@@ -572,8 +578,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+//    final themeProvider = Provider.of<ThemeProvider>(context);
     final Brightness brightnessValue = MediaQuery.of(context).platformBrightness;
     bool isDark = brightnessValue == Brightness.dark;
+
     print("다크모드? $isDark");
     return Scaffold(
         drawer: Drawer(
@@ -763,6 +771,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Navigator.of(context).pop();
                 },
               ),
+
             ],
           ),
         ),
