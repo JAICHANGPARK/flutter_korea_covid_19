@@ -600,7 +600,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => InformationWebViewPage(
-                            url: "http://ncov.mohw.go.kr/shBoardView.do?brdId=3&brdGubun=36&ncvContSeq=1092",
+                            url: "http://blog.naver.com/kfdazzang/221839489769",
                             title: "공적마스크 구매 안내",
                           )));
                 },
