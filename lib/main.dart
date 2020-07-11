@@ -1899,6 +1899,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
+          elevation: 12,
             currentIndex: pageIndex,
             selectedItemColor: Colors.indigo,
             onTap: (newValue) {
