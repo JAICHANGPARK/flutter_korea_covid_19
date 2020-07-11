@@ -1,10 +1,10 @@
 name: fluttermasktest
-description: A new Flutter application.
+description: A new Flutter application for Public Mask in Republic of Korea.
 authors:
   - Dreamwalker(aristojeff@gmail.com)
 homepage: https://github.com/JAICHANGPARK
 
-version: 1.4.0+25
+version: 1.4.1+26
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -26,17 +26,17 @@ dependencies:
   firebase_remote_config: ^0.3.0+3
   firebase_messaging: ^6.0.12
 
-  location: ^2.5.3
+  location: ^3.0.2
 
   kopo: ^0.1.1
   package_info: ^0.4.1
   url_launcher: ^5.5.0
   firebase_analytics: ^5.0.11
-  google_nav_bar: ^2.0.1
+  google_nav_bar: ^2.2.0
   line_icons: any
 
   avatar_glow: any
-  sliding_up_panel: ^1.0.0
+  sliding_up_panel: ^1.0.2
 
   flutter_map: any
   flutter_map_marker_cluster: any
@@ -49,7 +49,7 @@ dependencies:
 
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.7.3
+  flutter_launcher_icons: ^0.7.5
   hive_generator: any
   build_runner: any
 
