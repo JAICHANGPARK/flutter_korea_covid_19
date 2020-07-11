@@ -35,9 +35,9 @@ class _UnderConstructPageState extends State<UnderConstructPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
+
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -51,7 +51,7 @@ class _UnderConstructPageState extends State<UnderConstructPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
-              child: Text(_text ?? "...잠시만 기다려주세요..."),
+              child: Text(_text ?? "...잠시만 기다려주세요...", style: Theme.of(context).textTheme.bodyText1,),
             ),
           ),
         ],
