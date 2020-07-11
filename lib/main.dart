@@ -776,6 +776,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         appBar: AppBar(
+          backgroundColor: Colors.indigo,
           title: Text(
             widget.title,
           ),
@@ -1899,6 +1900,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         bottomNavigationBar: BottomNavigationBar(
             currentIndex: pageIndex,
+            selectedItemColor: Colors.indigo,
             onTap: (newValue) {
               if (newValue == 2) {
                 getUserBirth().then((value) {
