@@ -290,17 +290,17 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.DENIED) {
+    if (_permissionGranted == PermissionStatus.denied) {
       print("원래 권한이 디나인");
       _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.GRANTED) {
+      if (_permissionGranted != PermissionStatus.granted) {
         print("요청하고 위치 권한 허용 안함");
         return true;
       } else {
         print("요청하고 위치권한 허용함.");
         return false;
       }
-    } else if (_permissionGranted == PermissionStatus.DENIED_FOREVER) {
+    } else if (_permissionGranted == PermissionStatus.deniedForever) {
       print("영원히 거부 ");
       return false;
     } else {
@@ -388,7 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         });
 
-        locationSubscription = location.onLocationChanged().listen((result) {
+        locationSubscription = location.onLocationChanged.listen((result) {
           setState(() {
             _locationData = result;
           });
@@ -524,7 +524,7 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           });
 
-          locationSubscription = location.onLocationChanged().listen((result) {
+          locationSubscription = location.onLocationChanged.listen((result) {
             setState(() {
               _locationData = result;
             });
@@ -1131,10 +1131,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     GestureDetector(
                                       onTap: () async {
                                         _permissionGranted = await location.hasPermission();
-                                        if (_permissionGranted == PermissionStatus.DENIED) {
+                                        if (_permissionGranted == PermissionStatus.denied) {
                                           print("원래 권한이 디나인");
                                           _permissionGranted = await location.requestPermission();
-                                          if (_permissionGranted != PermissionStatus.GRANTED) {
+                                          if (_permissionGranted != PermissionStatus.granted) {
                                             print("요청하고 위치 권한 허용 안함");
                                           } else {
                                             print("요청하고 위치권한 허용함.");
@@ -2034,10 +2034,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () async {
                 analytics.logEvent(name: "onClickTouch");
                 _permissionGranted = await location.hasPermission();
-                if (_permissionGranted == PermissionStatus.DENIED) {
+                if (_permissionGranted == PermissionStatus.denied) {
                   print("원래 권한이 디나인");
                   _permissionGranted = await location.requestPermission();
-                  if (_permissionGranted != PermissionStatus.GRANTED) {
+                  if (_permissionGranted != PermissionStatus.granted) {
                     print("요청하고 위치 권한 허용 안함");
                   } else {
                     print("요청하고 위치권한 허용함.");
